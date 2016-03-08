@@ -2,11 +2,13 @@ package com.veyndan.generic;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,6 +23,7 @@ import android.widget.ToggleButton;
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +45,14 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
     @Override
     protected VH onCreateHeaderItemViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.header, parent, false);
+                .inflate(R.layout.item_header, parent, false);
         return new VHHeader(v, context);
     }
 
     @Override
     protected VH onCreateContentItemViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item, parent, false);
+                .inflate(R.layout.item_content, parent, false);
         return new VHItem(v, context);
     }
 
@@ -93,7 +96,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
     }
 
     @Override
-    protected void onBindContentItemViewHolder(VH holder, int position) {
+    protected void onBindContentItemViewHolder(VH holder, final int position) {
         VHItem vhItem = (VHItem) holder;
         Post post = getItem(position);
         Glide.with(context).load(post.getProfile()).into(vhItem.profile);
@@ -127,6 +130,41 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
                     Log.e(TAG, String.format("Unknown description type: %d", description.getType()));
             }
         }
+
+        final PopupMenu otherMenu = new PopupMenu(context, vhItem.other);
+        otherMenu.getMenuInflater().inflate(R.menu.menu_other, otherMenu.getMenu());
+
+        // Force show icon
+        try {
+            Field fieldPopup = otherMenu.getClass().getDeclaredField("mPopup");
+            fieldPopup.setAccessible(true);
+            MenuPopupHelper mPopup = (MenuPopupHelper) fieldPopup.get(otherMenu);
+            mPopup.setForceShowIcon(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        vhItem.other.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                otherMenu.show();
+            }
+        });
+
+        otherMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_delete:
+                        getRef(position).removeValue();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     public static class VH extends RecyclerView.ViewHolder {
@@ -177,7 +215,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
         final Button pins;
         final LinearLayout description;
         final ToggleButton heart, code, basket;
-        final AppCompatImageButton more;
+        final AppCompatImageButton other, more;
 
         public VHItem(View v, Context context) {
             super(v);
@@ -187,6 +225,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
             heart = (ToggleButton) v.findViewById(R.id.heart);
             code = (ToggleButton) v.findViewById(R.id.code);
             basket = (ToggleButton) v.findViewById(R.id.basket);
+            other = (AppCompatImageButton) v.findViewById(R.id.other);
             more = (AppCompatImageButton) v.findViewById(R.id.more);
 
             // Popup menu for QAB overflow
