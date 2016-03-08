@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.firebase.client.Firebase;
 
 public class HomeFragment extends Fragment {
+    @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeFragment.class);
+
+    private HomeAdapter adapter;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -33,10 +35,15 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        HomeAdapter adapter = new HomeAdapter(getActivity());
+        adapter = new HomeAdapter(getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"));
         recyclerView.setAdapter(adapter);
 
         return recyclerView;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        adapter.cleanup();
+    }
 }

@@ -19,60 +19,24 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.veyndan.generic.ui.RecyclerHeader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
+public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeAdapter.class);
 
-    private Firebase ref;
-
     private final Context context;
-    private final List<Post> posts;
     private final Resources res;
+    private final Firebase rootRef;
 
-    public HomeAdapter(Context context) {
+    public HomeAdapter(Context context, Firebase rootRef) {
+        super(Post.class, rootRef);
         this.context = context;
-        this.posts = new ArrayList<>();
-        res = context.getResources();
-
-        ref = new Firebase("https://sweltering-heat-8337.firebaseio.com/users");
-
-        ref.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-                HomeAdapter.this.posts.add(0, snapshot.getValue(Post.class));
-                notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot snapshot) {
-                HomeAdapter.this.posts.remove(snapshot.getValue(Post.class));
-                notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
+        this.res = context.getResources();
+        this.rootRef = rootRef;
     }
 
     @Override
@@ -90,11 +54,6 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
     }
 
     @Override
-    protected int getContentItemCount() {
-        return posts.size();
-    }
-
-    @Override
     protected void onBindHeaderItemViewHolder(VH holder, int position) {
         final VHHeader vhHeader = (VHHeader) holder;
         Glide.with(context).load("https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9").into(vhHeader.profile);
@@ -103,7 +62,7 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
 
         vhHeader.description.removeAllViewsInLayout();
 
-        EditText paragraph = (EditText) LayoutInflater.from(vhHeader.description.getContext())
+        final EditText paragraph = (EditText) LayoutInflater.from(vhHeader.description.getContext())
                 .inflate(R.layout.description_paragraph_new, vhHeader.description, false);
         vhHeader.description.addView(paragraph);
 
@@ -120,7 +79,7 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
                         ));
                     }
                 }
-                ref.push().setValue(new Post(
+                rootRef.push().setValue(new Post(
                         vhHeader.name.getText().toString(),
                         "Now",
                         vhHeader.visibility.getSelectedItem().toString(),
@@ -128,6 +87,7 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
                         "https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9",
                         descriptions
                 ));
+                paragraph.setText(null);
             }
         });
     }
@@ -135,7 +95,7 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
     @Override
     protected void onBindContentItemViewHolder(VH holder, int position) {
         VHItem vhItem = (VHItem) holder;
-        Post post = posts.get(position);
+        Post post = getItem(position);
         Glide.with(context).load(post.getProfile()).into(vhItem.profile);
         vhItem.name.setText(post.getName());
         vhItem.about.setText(context.getString(R.string.about, post.getDate(), post.getVisibility()));
@@ -170,6 +130,8 @@ public class HomeAdapter extends RecyclerHeader<HomeAdapter.VH> {
     }
 
     public static class VH extends RecyclerView.ViewHolder {
+        @SuppressWarnings("unused")
+        private static final String TAG = LogUtils.makeLogTag(VH.class);
 
         final LinearLayout description;
         final TextView name;

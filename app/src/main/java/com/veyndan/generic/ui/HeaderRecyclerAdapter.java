@@ -5,12 +5,14 @@ import android.view.ViewGroup;
 
 import com.veyndan.generic.LogUtils;
 
-public abstract class RecyclerHeader<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class HeaderRecyclerAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
     @SuppressWarnings("unused")
-    private static final String TAG = LogUtils.makeLogTag(RecyclerHeader.class);
+    private static final String TAG = LogUtils.makeLogTag(HeaderRecyclerAdapter.class);
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
+
+    protected static final int HEADER_SIZE = 1;
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -33,7 +35,7 @@ public abstract class RecyclerHeader<VH extends RecyclerView.ViewHolder> extends
         if (position == 0) {
             onBindHeaderItemViewHolder(holder, position);
         } else {
-            onBindContentItemViewHolder(holder, position - 1);
+            onBindContentItemViewHolder(holder, position - HEADER_SIZE);
         }
     }
 
@@ -43,7 +45,7 @@ public abstract class RecyclerHeader<VH extends RecyclerView.ViewHolder> extends
 
     @Override
     public int getItemCount() {
-        return getContentItemCount() + 1;
+        return getContentItemCount() + HEADER_SIZE;
     }
 
     @Override
