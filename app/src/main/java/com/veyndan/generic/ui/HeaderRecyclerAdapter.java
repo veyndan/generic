@@ -10,7 +10,7 @@ public abstract class HeaderRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
     private static final String TAG = LogUtils.makeLogTag(HeaderRecyclerAdapter.class);
 
     private static final int TYPE_HEADER = 0;
-    private static final int TYPE_ITEM = 1;
+    private static final int TYPE_CONTENT = 1;
 
     protected static final int HEADER_SIZE = 1;
 
@@ -19,7 +19,7 @@ public abstract class HeaderRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
         switch (viewType) {
             case TYPE_HEADER:
                 return onCreateHeaderItemViewHolder(parent);
-            case TYPE_ITEM:
+            case TYPE_CONTENT:
                 return onCreateContentItemViewHolder(parent);
             default:
                 throw new IllegalStateException();
@@ -50,7 +50,7 @@ public abstract class HeaderRecyclerAdapter<VH extends RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? TYPE_HEADER : TYPE_ITEM;
+        return position == 0 ? TYPE_HEADER : TYPE_CONTENT;
     }
 
     protected abstract int getContentItemCount();
