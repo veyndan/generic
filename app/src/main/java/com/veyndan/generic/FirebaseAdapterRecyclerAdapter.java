@@ -100,10 +100,10 @@ public abstract class FirebaseAdapterRecyclerAdapter<T, VH extends RecyclerView.
                         notifyItemInserted(index + HEADER_SIZE);
                         break;
                     case Changed:
-                        notifyItemChanged(index);
+                        notifyItemChanged(index + HEADER_SIZE);
                         break;
                     case Removed:
-                        notifyItemRemoved(index);
+                        notifyItemRemoved(index + HEADER_SIZE);
                         break;
                     case Moved:
                         notifyItemMoved(oldIndex, index);
