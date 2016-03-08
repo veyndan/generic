@@ -214,8 +214,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
             description = (LinearLayout) v.findViewById(R.id.description);
             name = (TextView) v.findViewById(R.id.name);
             profile = (ImageView) v.findViewById(R.id.profile);
-
-            UIUtils.grayscale(profile);
         }
     }
 
