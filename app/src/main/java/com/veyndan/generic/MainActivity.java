@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity {
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             if (tab != null) {
-                tab.setIcon(R.drawable.ic_home_black_24dp);
+                tab.setIcon(R.drawable.ic_home_24dp);
             }
         }
 

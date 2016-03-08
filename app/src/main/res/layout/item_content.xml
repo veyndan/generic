@@ -52,7 +52,7 @@
         android:layout_alignParentTop="true"
         android:layout_margin="16dp"
         android:background="?selectableItemBackgroundBorderless"
-        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+        app:srcCompat="@drawable/ic_more_vert_24dp" />
 
     <include
         layout="@layout/description"

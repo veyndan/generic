@@ -51,6 +51,17 @@
         android:layout_toEndOf="@id/date"
         android:layout_toRightOf="@id/date" />
 
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/attach"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:background="?selectableItemBackgroundBorderless"
+        app:srcCompat="@drawable/ic_attach_file_24dp" />
+
     <include
         layout="@layout/description"
         android:layout_width="match_parent"

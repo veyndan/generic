@@ -57,7 +57,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
     }
 
     @Override
-    protected void onBindHeaderItemViewHolder(VH holder, int position) {
+    protected void onBindHeaderItemViewHolder(VH holder, final int position) {
         final VHHeader vhHeader = (VHHeader) holder;
         Glide.with(context).load("https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9").into(vhHeader.profile);
         vhHeader.name.setText("Veyndan Stuart");
@@ -91,6 +91,40 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
                         descriptions
                 ));
                 paragraph.setText(null);
+            }
+        });
+
+        final PopupMenu otherMenu = new PopupMenu(context, vhHeader.attach);
+        otherMenu.getMenuInflater().inflate(R.menu.menu_attach, otherMenu.getMenu());
+
+        // Force show icon
+        try {
+            Field fieldPopup = otherMenu.getClass().getDeclaredField("mPopup");
+            fieldPopup.setAccessible(true);
+            MenuPopupHelper mPopup = (MenuPopupHelper) fieldPopup.get(otherMenu);
+            mPopup.setForceShowIcon(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        vhHeader.attach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                otherMenu.show();
+            }
+        });
+
+        otherMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_picture:
+                        return true;
+                    default:
+                        return false;
+                }
             }
         });
     }
@@ -192,12 +226,14 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
         final TextView date;
         final Button post;
         final Spinner visibility;
+        final AppCompatImageButton attach;
 
         public VHHeader(View v, Context context) {
             super(v);
             date = (TextView) v.findViewById(R.id.date);
             post = (Button) v.findViewById(R.id.post);
             visibility = (Spinner) v.findViewById(R.id.visibility);
+            attach = (AppCompatImageButton) v.findViewById(R.id.attach);
 
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
                     R.array.visibility, R.layout.spinner_visibility);
