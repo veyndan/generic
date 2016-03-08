@@ -6,6 +6,7 @@
     <string name="date">%1$s &#8226; </string>
     <string name="delete">Delete</string>
     <string name="picture">Picture</string>
+    <string name="post">Post</string>
     <plurals name="pins">
         <item quantity="one">%d Pin</item>
         <item quantity="other">%s Pins</item>
