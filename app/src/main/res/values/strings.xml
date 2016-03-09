@@ -8,6 +8,7 @@
     <string name="picture">Picture</string>
     <string name="post">Post</string>
     <string name="text">Text</string>
+    <string name="reminder">Reminder</string>
     <plurals name="pins">
         <item quantity="one">%d Pin</item>
         <item quantity="other">%s Pins</item>

@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_camera_alt_24dp"
         android:title="@string/picture" />
 
+    <item
+        android:id="@+id/action_reminder"
+        android:icon="@drawable/ic_alarm_24dp"
+        android:title="@string/reminder"/>
+
 </menu>
