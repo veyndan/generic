@@ -27,7 +27,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapter.VH> {
+public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeAdapter.class);
 
@@ -36,7 +36,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
     private final Firebase rootRef;
 
     public HomeAdapter(Context context, Firebase rootRef) {
-        super(Post.class, rootRef);
+        super(Note.class, rootRef);
         this.context = context;
         this.res = context.getResources();
         this.rootRef = rootRef;
@@ -72,17 +72,17 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
         vhHeader.post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Post.Description> descriptions = new ArrayList<>();
+                List<Note.Description> descriptions = new ArrayList<>();
                 for (int i = 0; i < vhHeader.description.getChildCount(); i++) {
                     View child = vhHeader.description.getChildAt(i);
                     if (child instanceof EditText) {
-                        descriptions.add(new Post.Description(
+                        descriptions.add(new Note.Description(
                                 ((EditText) child).getText().toString(),
-                                Post.Description.TYPE_PARAGRAPH
+                                Note.Description.TYPE_PARAGRAPH
                         ));
                     }
                 }
-                rootRef.push().setValue(new Post(
+                rootRef.push().setValue(new Note(
                         vhHeader.name.getText().toString(),
                         "Now",
                         vhHeader.visibility.getSelectedItem().toString(),
@@ -132,28 +132,28 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Post, HomeAdapte
     @Override
     protected void onBindContentItemViewHolder(VH holder, final int position) {
         VHItem vhItem = (VHItem) holder;
-        Post post = getItem(position);
-        Glide.with(context).load(post.getProfile()).into(vhItem.profile);
-        vhItem.name.setText(post.getName());
-        vhItem.about.setText(context.getString(R.string.about, post.getDate(), post.getVisibility()));
+        Note note = getItem(position);
+        Glide.with(context).load(note.getProfile()).into(vhItem.profile);
+        vhItem.name.setText(note.getName());
+        vhItem.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
 
         try {
-            int pinCount = Integer.parseInt(post.getPins());
+            int pinCount = Integer.parseInt(note.getPins());
             vhItem.pins.setText(res.getQuantityString(R.plurals.pins, pinCount, pinCount));
         } catch (NumberFormatException e) {
-            vhItem.pins.setText(res.getQuantityString(R.plurals.pins, -1, post.getPins()));
+            vhItem.pins.setText(res.getQuantityString(R.plurals.pins, -1, note.getPins()));
         }
 
-        for (Post.Description description : post.getDescriptions()) {
+        for (Note.Description description : note.getDescriptions()) {
             switch (description.getType()) {
-                case Post.Description.TYPE_PARAGRAPH:
+                case Note.Description.TYPE_PARAGRAPH:
                     TextView paragraph = (TextView) LayoutInflater.from(vhItem.description.getContext())
                             .inflate(R.layout.description_paragraph, vhItem.description, false);
                     vhItem.description.removeAllViewsInLayout();
                     vhItem.description.addView(paragraph);
                     paragraph.setText(description.getBody());
                     break;
-                case Post.Description.TYPE_IMAGE:
+                case Note.Description.TYPE_IMAGE:
                     ImageView image = (ImageView) LayoutInflater.from(vhItem.description.getContext())
                             .inflate(R.layout.description_image, vhItem.description, false);
                     vhItem.description.removeAllViewsInLayout();

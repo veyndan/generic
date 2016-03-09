@@ -2,7 +2,7 @@ package com.veyndan.generic;
 
 import java.util.List;
 
-public class Post {
+public class Note {
     private String name;
     private String date;
     private String visibility;
@@ -10,11 +10,11 @@ public class Post {
     private String profile;
     private List<Description> descriptions;
 
-    public Post() {
-        // empty default constructor, necessary for Firebase to be able to deserialize blog posts
+    public Note() {
+        // empty default constructor, necessary for Firebase to be able to deserialize notes
     }
 
-    public Post(String name, String date, String visiblity, String pins, String profile, List<Description> descriptions) {
+    public Note(String name, String date, String visiblity, String pins, String profile, List<Description> descriptions) {
         this.name = name;
         this.date = date;
         this.visibility = visiblity;
@@ -49,7 +49,7 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{" +
+        return "Note{" +
                 "name='" + name + '\'' +
                 ", date='" + date + '\'' +
                 ", visibility='" + visibility + '\'' +
@@ -64,15 +64,15 @@ public class Post {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Post post = (Post) o;
+        Note note = (Note) o;
 
-        if (name != null ? !name.equals(post.name) : post.name != null) return false;
-        if (date != null ? !date.equals(post.date) : post.date != null) return false;
-        if (visibility != null ? !visibility.equals(post.visibility) : post.visibility != null)
+        if (name != null ? !name.equals(note.name) : note.name != null) return false;
+        if (date != null ? !date.equals(note.date) : note.date != null) return false;
+        if (visibility != null ? !visibility.equals(note.visibility) : note.visibility != null)
             return false;
-        if (pins != null ? !pins.equals(post.pins) : post.pins != null) return false;
-        if (profile != null ? !profile.equals(post.profile) : post.profile != null) return false;
-        return descriptions != null ? descriptions.equals(post.descriptions) : post.descriptions == null;
+        if (pins != null ? !pins.equals(note.pins) : note.pins != null) return false;
+        if (profile != null ? !profile.equals(note.profile) : note.profile != null) return false;
+        return descriptions != null ? descriptions.equals(note.descriptions) : note.descriptions == null;
 
     }
 
@@ -95,7 +95,7 @@ public class Post {
         private int type;
 
         public Description() {
-            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
+            // empty default constructor, necessary for Firebase to be able to deserialize descriptions
         }
 
         public Description(String body, int type) {
