@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/action_text"
-        android:icon="@drawable/ic_text_fields_black_24dp"
+        android:icon="@drawable/ic_text_fields_24dp"
         android:title="@string/text" />
 
     <item
