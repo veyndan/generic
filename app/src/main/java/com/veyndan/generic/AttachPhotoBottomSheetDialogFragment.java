@@ -8,9 +8,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import com.veyndan.generic.ui.GridSpacingItemDecoration;
+import com.veyndan.generic.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +49,17 @@ public class AttachPhotoBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
         RecyclerView recyclerView = (RecyclerView) contentView.findViewById(R.id.attach_photo_recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(3, UIUtils.dpToPx(getContext(), 4), false));
         recyclerView.setHasFixedSize(true);
+        DefaultItemAnimator animator = new DefaultItemAnimator() {
+            @Override
+            public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
+                // IMPORTANT: Allows animations in RecyclerView e.g. ImageView spring, to continue
+                // on notifying data set change.
+                return true;
+            }
+        };
+        recyclerView.setItemAnimator(animator);
         recyclerView.setAdapter(new ImagesAdapter(getContext(), getImagesPath(getContext())));
     }
 

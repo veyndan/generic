@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.veyndan.generic.ui.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_attach_camera_image"
+
+<!-- Wrapped in SquareFrameLayout as when image scaled down, pressing the container will
+deselect the image as well-->
+<com.veyndan.generic.ui.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    android:layout_margin="8dp"
-    android:scaleType="centerCrop" />
+    android:background="#f4f4f4">
+
+    <ImageView
+        android:id="@+id/item_attach_camera_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/item_attach_count"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignTop="@id/item_attach_camera_image"
+        android:background="@drawable/attach_select_circle"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_xsmall"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</com.veyndan.generic.ui.SquareRelativeLayout>
