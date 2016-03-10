@@ -2,6 +2,8 @@ package com.veyndan.generic;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.PopupMenu;
@@ -22,6 +24,7 @@ import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
+import com.veyndan.generic.util.LogUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -31,15 +34,17 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeAdapter.class);
 
-    private final Context context;
+    private final FragmentActivity context;
+    private final MenuAttach listener;
     private final Resources res;
     private final Firebase rootRef;
 
-    public HomeAdapter(Context context, Firebase rootRef) {
+    public HomeAdapter(FragmentActivity context, Firebase rootRef, MenuAttach listener) {
         super(Note.class, rootRef);
         this.context = context;
-        this.res = context.getResources();
         this.rootRef = rootRef;
+        this.listener = listener;
+        this.res = context.getResources();
     }
 
     @Override
@@ -53,13 +58,15 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     protected VH onCreateContentItemViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_content, parent, false);
-        return new VHItem(v, context);
+        return new VHContent(v, context);
     }
 
     @Override
     protected void onBindHeaderItemViewHolder(VH holder, final int position) {
         final VHHeader vhHeader = (VHHeader) holder;
-        Glide.with(context).load("https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9").into(vhHeader.profile);
+        Glide.with(context).load("https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/" +
+                "t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=" +
+                "85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9").into(vhHeader.profile);
         vhHeader.name.setText("Veyndan Stuart");
         vhHeader.date.setText(context.getString(R.string.date, "Now"));
 
@@ -87,7 +94,9 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                         "Now",
                         vhHeader.visibility.getSelectedItem().toString(),
                         "0",
-                        "https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_1387041911520027_1668446817_n.jpg?oh=85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9",
+                        "https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_" +
+                                "1387041911520027_1668446817_n.jpg?oh=" +
+                                "85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9",
                         descriptions
                 ));
                 paragraph.setText(null);
@@ -121,6 +130,10 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_picture:
+//                        listener.menuAttachPhoto();
+                        BottomSheetDialogFragment bottomSheetDialogFragment = new AttachPhotoBottomSheetDialogFragment();
+                        bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+
                         return true;
                     default:
                         return false;
@@ -131,33 +144,33 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
 
     @Override
     protected void onBindContentItemViewHolder(VH holder, final int position) {
-        VHItem vhItem = (VHItem) holder;
+        VHContent vhContent = (VHContent) holder;
         Note note = getItem(position);
-        Glide.with(context).load(note.getProfile()).into(vhItem.profile);
-        vhItem.name.setText(note.getName());
-        vhItem.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
+        Glide.with(context).load(note.getProfile()).into(vhContent.profile);
+        vhContent.name.setText(note.getName());
+        vhContent.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
 
         try {
             int pinCount = Integer.parseInt(note.getPins());
-            vhItem.pins.setText(res.getQuantityString(R.plurals.pins, pinCount, pinCount));
+            vhContent.pins.setText(res.getQuantityString(R.plurals.pins, pinCount, pinCount));
         } catch (NumberFormatException e) {
-            vhItem.pins.setText(res.getQuantityString(R.plurals.pins, -1, note.getPins()));
+            vhContent.pins.setText(res.getQuantityString(R.plurals.pins, -1, note.getPins()));
         }
 
         for (Note.Description description : note.getDescriptions()) {
             switch (description.getType()) {
                 case Note.Description.TYPE_PARAGRAPH:
-                    TextView paragraph = (TextView) LayoutInflater.from(vhItem.description.getContext())
-                            .inflate(R.layout.description_paragraph, vhItem.description, false);
-                    vhItem.description.removeAllViewsInLayout();
-                    vhItem.description.addView(paragraph);
+                    TextView paragraph = (TextView) LayoutInflater.from(vhContent.description.getContext())
+                            .inflate(R.layout.description_paragraph, vhContent.description, false);
+                    vhContent.description.removeAllViewsInLayout();
+                    vhContent.description.addView(paragraph);
                     paragraph.setText(description.getBody());
                     break;
                 case Note.Description.TYPE_IMAGE:
-                    ImageView image = (ImageView) LayoutInflater.from(vhItem.description.getContext())
-                            .inflate(R.layout.description_image, vhItem.description, false);
-                    vhItem.description.removeAllViewsInLayout();
-                    vhItem.description.addView(image);
+                    ImageView image = (ImageView) LayoutInflater.from(vhContent.description.getContext())
+                            .inflate(R.layout.description_image, vhContent.description, false);
+                    vhContent.description.removeAllViewsInLayout();
+                    vhContent.description.addView(image);
                     Glide.with(context).load(description.getBody()).into(image);
                     break;
                 default:
@@ -165,7 +178,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             }
         }
 
-        final PopupMenu otherMenu = new PopupMenu(context, vhItem.other);
+        final PopupMenu otherMenu = new PopupMenu(context, vhContent.other);
         otherMenu.getMenuInflater().inflate(R.menu.menu_other, otherMenu.getMenu());
 
         // Force show icon
@@ -180,7 +193,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             e.printStackTrace();
         }
 
-        vhItem.other.setOnClickListener(new View.OnClickListener() {
+        vhContent.other.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 otherMenu.show();
@@ -219,7 +232,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
 
     public static class VHHeader extends VH {
         @SuppressWarnings("unused")
-        private static final String TAG = LogUtils.makeLogTag(VHItem.class);
+        private static final String TAG = LogUtils.makeLogTag(VHContent.class);
 
         final TextView date;
         final Button post;
@@ -237,13 +250,12 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                     R.array.visibility, R.layout.spinner_visibility);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             visibility.setAdapter(adapter);
-
         }
     }
 
-    public static class VHItem extends VH {
+    public static class VHContent extends VH {
         @SuppressWarnings("unused")
-        private static final String TAG = LogUtils.makeLogTag(VHItem.class);
+        private static final String TAG = LogUtils.makeLogTag(VHContent.class);
 
         final TextView about;
         final Button pins;
@@ -251,7 +263,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         final ToggleButton heart, code, basket;
         final AppCompatImageButton other, more;
 
-        public VHItem(View v, Context context) {
+        public VHContent(View v, Context context) {
             super(v);
             about = (TextView) v.findViewById(R.id.about);
             pins = (Button) v.findViewById(R.id.pins);

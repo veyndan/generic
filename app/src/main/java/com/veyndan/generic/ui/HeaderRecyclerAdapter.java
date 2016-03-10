@@ -3,7 +3,7 @@ package com.veyndan.generic.ui;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.veyndan.generic.LogUtils;
+import com.veyndan.generic.util.LogUtils;
 
 public abstract class HeaderRecyclerAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
     @SuppressWarnings("unused")

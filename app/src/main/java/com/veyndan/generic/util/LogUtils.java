@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.veyndan.generic;
+package com.veyndan.generic.util;
 
 public class LogUtils {
     private static final String LOG_PREFIX = "veyndan_";

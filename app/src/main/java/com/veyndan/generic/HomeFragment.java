@@ -1,5 +1,6 @@
 package com.veyndan.generic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,10 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.client.Firebase;
+import com.veyndan.generic.util.LogUtils;
 
 public class HomeFragment extends Fragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeFragment.class);
+
+    private MenuAttach mListener;
 
     private HomeAdapter adapter;
 
@@ -35,7 +39,7 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        adapter = new HomeAdapter(getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"));
+        adapter = new HomeAdapter(getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"), mListener);
         recyclerView.setAdapter(adapter);
 
         return recyclerView;
@@ -45,5 +49,17 @@ public class HomeFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         adapter.cleanup();
+        mListener = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MenuAttach) {
+            mListener = (MenuAttach) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MenuAttach");
+        }
     }
 }

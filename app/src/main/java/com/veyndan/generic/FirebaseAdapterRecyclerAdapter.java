@@ -34,6 +34,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
 import com.veyndan.generic.ui.HeaderRecyclerAdapter;
+import com.veyndan.generic.util.LogUtils;
 
 /**
  * This class is a generic way of backing an RecyclerView with a Firebase location.

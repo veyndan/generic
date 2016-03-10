@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.util;
 
 import android.content.Context;
 import android.graphics.ColorMatrix;

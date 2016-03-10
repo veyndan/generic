@@ -49,8 +49,8 @@
         android:layout_height="40dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
         android:layout_margin="16dp"
+        android:layout_alignParentTop="true"
         android:background="?selectableItemBackgroundBorderless"
         app:srcCompat="@drawable/ic_more_vert_24dp" />
 
