@@ -35,15 +35,13 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     private static final String TAG = LogUtils.makeLogTag(HomeAdapter.class);
 
     private final FragmentActivity context;
-    private final MenuAttach listener;
     private final Resources res;
     private final Firebase rootRef;
 
-    public HomeAdapter(FragmentActivity context, Firebase rootRef, MenuAttach listener) {
+    public HomeAdapter(FragmentActivity context, Firebase rootRef) {
         super(Note.class, rootRef);
         this.context = context;
         this.rootRef = rootRef;
-        this.listener = listener;
         this.res = context.getResources();
     }
 
@@ -130,7 +128,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_picture:
-//                        listener.menuAttachPhoto();
                         BottomSheetDialogFragment bottomSheetDialogFragment = new AttachPhotoBottomSheetDialogFragment();
                         bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 

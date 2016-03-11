@@ -1,7 +1,6 @@
 package com.veyndan.generic;
 
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,11 +12,9 @@ import android.view.MenuItem;
 
 import com.veyndan.generic.util.LogUtils;
 
-public class MainActivity extends BaseActivity implements MenuAttach {
+public class MainActivity extends BaseActivity {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(MainActivity.class);
-
-    private BottomSheetBehavior behavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +59,6 @@ public class MainActivity extends BaseActivity implements MenuAttach {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void menuAttachPhoto() {
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
