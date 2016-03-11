@@ -53,10 +53,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
     public void onBindViewHolder(VH holder, int position) {
         Glide.with(context).loadFromMediaStore(
                 Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
-        int visibility;
         float scale;
         if (!selected.contains(position)) {
-            visibility = View.GONE;
+            holder.count.setVisibility(View.GONE);
             scale = 1f;
         } else {
             int margin = (int) ((holder.itemView.getWidth() -
@@ -64,10 +63,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
                     .setMargins(margin, margin, margin, margin);
             holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
-            visibility = View.VISIBLE;
+            holder.count.setVisibility(View.VISIBLE);
             scale = SPRING_SCALE;
         }
-        holder.count.setVisibility(visibility);
         if (holder.spring.isAtRest()) {
             holder.image.setScaleX(scale);
             holder.image.setScaleY(scale);
@@ -108,19 +106,19 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    double endValue;
                     if (!selected.contains(getAdapterPosition())) {
-                        endValue = 1;
+                        spring.setCurrentValue(0, true);
+                        spring.setEndValue(1);
                         selected.add(getAdapterPosition());
                     } else {
-                        endValue = 0;
+                        spring.setCurrentValue(1, true);
+                        spring.setEndValue(0);
                         int c = selected.indexOf(getAdapterPosition());
                         selected.remove(c);
                         for (int i = c; i < selected.size(); i++) {
                             notifyItemChanged(selected.get(i));
                         }
                     }
-                    spring.setEndValue(endValue);
                     notifyItemChanged(getAdapterPosition());
                 }
             });
