@@ -126,7 +126,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                         spring.setEndValue(0);
                         int c = selected.indexOf(getAdapterPosition());
                         selected.remove(c);
-                        notifyItemRangeChanged(c, selected.size());
+                        for (int i = c; i < selected.size(); i++) {
+                            notifyItemChanged(selected.get(i));
+                        }
                     }
                     notifyItemChanged(getAdapterPosition());
                 }
