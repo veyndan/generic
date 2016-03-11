@@ -59,7 +59,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             scale = 1f;
         } else {
             int margin = (int) ((holder.itemView.getWidth() -
-                    holder.itemView.getWidth() * SPRING_SCALE) / 2 - UIUtils.dpToPx(context, 12));
+                    holder.itemView.getWidth() * SPRING_SCALE) / 2 - UIUtils.dpToPx(context, 8));
             ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
                     .setMargins(margin, margin, margin, margin);
             holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
