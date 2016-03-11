@@ -33,6 +33,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
 
     private final SpringSystem springSystem;
 
+    private int counterMargin = 0;
+
     public ImagesAdapter(Context context, List<String> imagePaths) {
         this.context = context;
         this.imagePaths = imagePaths;
@@ -58,10 +60,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             holder.count.setVisibility(View.GONE);
             scale = 1f;
         } else {
-            int margin = (int) ((holder.itemView.getWidth() -
-                    holder.itemView.getWidth() * SPRING_SCALE) / 2 - UIUtils.dpToPx(context, 8));
             ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
-                    .setMargins(margin, margin, margin, margin);
+                    .setMargins(counterMargin, counterMargin, counterMargin, counterMargin);
             holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
             holder.count.setVisibility(View.VISIBLE);
             scale = SPRING_SCALE;
@@ -90,6 +90,17 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
+            if (counterMargin == 0) {
+                itemView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                               int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        counterMargin = (int) ((v.getWidth() * (1.0f - SPRING_SCALE)) / 2 - UIUtils.dpToPx(context, 8));
+                        itemView.removeOnLayoutChangeListener(this);
+                    }
+                });
+            }
+
             // Create a system to run the physics loop for a set of springs.
             spring = springSystem.createSpring();
 
@@ -115,9 +126,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                         spring.setEndValue(0);
                         int c = selected.indexOf(getAdapterPosition());
                         selected.remove(c);
-                        for (int i = c; i < selected.size(); i++) {
-                            notifyItemChanged(selected.get(i));
-                        }
+                        notifyItemRangeChanged(c, selected.size());
                     }
                     notifyItemChanged(getAdapterPosition());
                 }
