@@ -14,7 +14,7 @@ deselect the image as well-->
         android:scaleType="centerCrop" />
 
     <TextView
-        android:id="@+id/item_attach_count"
+        android:id="@+id/item_attach_camera_count"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_alignTop="@id/item_attach_camera_image"

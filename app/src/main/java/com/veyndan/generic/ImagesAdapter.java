@@ -27,31 +27,54 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(ImagesAdapter.class);
 
+    private static final float SPRING_SCALE = 0.72f;
+
     private final Context context;
     private final List<String> imagePaths;
-
     private final List<Integer> selected;
+
+    private final SpringSystem springSystem;
 
     public ImagesAdapter(Context context, List<String> imagePaths) {
         this.context = context;
         this.imagePaths = imagePaths;
 
         selected = new ArrayList<>(Collections.nCopies(imagePaths.size(), 0));
-        Log.d(TAG, "ImagesAdapter: " + selected);
+
+        springSystem = SpringSystem.create();
     }
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_attach_camera, parent, false);
-        return new VH(context, v, selected);
+        return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
         Glide.with(context).loadFromMediaStore(
                 Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
-        holder.count.setText(String.valueOf(selected.get(position)));
+        int visibility;
+        float scale;
+        if (selected.get(position) == 0) {
+            visibility = View.GONE;
+            scale = 1f;
+        } else {
+            int margin = (int) ((holder.itemView.getWidth() -
+                    holder.itemView.getWidth() * SPRING_SCALE) / 2 - UIUtils.dpToPx(context, 12));
+            ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
+                    .setMargins(margin, margin, margin, margin);
+            holder.count.setText(String.valueOf(selected.get(position)));
+            visibility = View.VISIBLE;
+            scale = SPRING_SCALE;
+        }
+        holder.count.setVisibility(visibility);
+        if (holder.spring.isAtRest()) {
+            Log.d(TAG, "onBindViewHolder: At rest " + position);
+            holder.image.setScaleX(scale);
+            holder.image.setScaleY(scale);
+        }
     }
 
     @Override
@@ -65,24 +88,21 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
 
         final ImageView image;
         final TextView count;
+        final Spring spring;
 
-        public VH(final Context context, final View itemView, final List<Integer> selected) {
+        public VH(final View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
-            count = (TextView) itemView.findViewById(R.id.item_attach_count);
+            count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
             // Create a system to run the physics loop for a set of springs.
-            final SpringSystem springSystem = SpringSystem.create();
-            final Spring spring = springSystem.createSpring();
-
-            final float depth = 0.72f;
+            spring = springSystem.createSpring();
 
             spring.addListener(new SimpleSpringListener() {
-
                 @Override
                 public void onSpringUpdate(Spring spring) {
                     float value = (float) spring.getCurrentValue();
-                    float scale = 1f - (value * (1f - depth));
+                    float scale = 1f - value * (1f - SPRING_SCALE);
                     image.setScaleX(scale);
                     image.setScaleY(scale);
                 }
@@ -91,13 +111,13 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    spring.setEndValue(spring.getEndValue() == 1.0f ? 0 : 1.0f);
-                    if (spring.getEndValue() == 1.0f) {
-                        selected.set(getAdapterPosition(), selected.size() - Collections.frequency(selected, 0) + 1);
-                        int margin = (int) ((itemView.getWidth() - itemView.getWidth() * depth) / 2 - UIUtils.dpToPx(context, 12));
-                        ((RelativeLayout.LayoutParams) count.getLayoutParams()).setMargins(margin, margin, margin, margin);
-                        count.setVisibility(View.VISIBLE);
+                    double endValue;
+                    if (selected.get(getAdapterPosition()) == 0) {
+                        endValue = 1;
+                        selected.set(getAdapterPosition(),
+                                selected.size() - Collections.frequency(selected, 0) + 1);
                     } else {
+                        endValue = 0;
                         int c = selected.get(getAdapterPosition());
                         for (int i = 0; i < selected.size(); i++) {
                             int current = selected.get(i);
@@ -107,10 +127,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                             }
                         }
                         selected.set(getAdapterPosition(), 0);
-                        count.setVisibility(View.GONE);
                     }
+                    spring.setEndValue(endValue);
                     notifyItemChanged(getAdapterPosition());
-                    Log.d(TAG, "onClick: " + selected);
                 }
             });
         }
