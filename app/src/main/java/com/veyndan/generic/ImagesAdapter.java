@@ -3,9 +3,11 @@ package com.veyndan.generic;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
@@ -91,18 +94,21 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
             if (counterMargin == 0) {
-                itemView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom,
-                                               int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        counterMargin = (int) ((v.getWidth() * (1.0f - SPRING_SCALE)) / 2 - UIUtils.dpToPx(context, 8));
-                        itemView.removeOnLayoutChangeListener(this);
+                    public boolean onPreDraw() {
+                        Log.d(TAG, "onPreDraw: ");
+                        counterMargin = (int) ((itemView.getWidth() * (1.0f - SPRING_SCALE)) / 2 - UIUtils.dpToPx(context, 8));
+                        itemView.getViewTreeObserver().removeOnPreDrawListener(this);
+                        return true;
                     }
                 });
             }
 
             // Create a system to run the physics loop for a set of springs.
             spring = springSystem.createSpring();
+
+            spring.setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(40, 7));
 
             spring.addListener(new SimpleSpringListener() {
                 @Override
