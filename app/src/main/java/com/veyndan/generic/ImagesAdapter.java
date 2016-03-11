@@ -3,7 +3,6 @@ package com.veyndan.generic;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import com.veyndan.generic.util.UIUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
@@ -39,7 +37,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
         this.context = context;
         this.imagePaths = imagePaths;
 
-        selected = new ArrayList<>(Collections.nCopies(imagePaths.size(), 0));
+        selected = new ArrayList<>(imagePaths.size());
 
         springSystem = SpringSystem.create();
     }
@@ -57,7 +55,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                 Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
         int visibility;
         float scale;
-        if (selected.get(position) == 0) {
+        if (!selected.contains(position)) {
             visibility = View.GONE;
             scale = 1f;
         } else {
@@ -65,13 +63,12 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                     holder.itemView.getWidth() * SPRING_SCALE) / 2 - UIUtils.dpToPx(context, 12));
             ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
                     .setMargins(margin, margin, margin, margin);
-            holder.count.setText(String.valueOf(selected.get(position)));
+            holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
             visibility = View.VISIBLE;
             scale = SPRING_SCALE;
         }
         holder.count.setVisibility(visibility);
         if (holder.spring.isAtRest()) {
-            Log.d(TAG, "onBindViewHolder: At rest " + position);
             holder.image.setScaleX(scale);
             holder.image.setScaleY(scale);
         }
@@ -112,21 +109,16 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                 @Override
                 public void onClick(View v) {
                     double endValue;
-                    if (selected.get(getAdapterPosition()) == 0) {
+                    if (!selected.contains(getAdapterPosition())) {
                         endValue = 1;
-                        selected.set(getAdapterPosition(),
-                                selected.size() - Collections.frequency(selected, 0) + 1);
+                        selected.add(getAdapterPosition());
                     } else {
                         endValue = 0;
-                        int c = selected.get(getAdapterPosition());
-                        for (int i = 0; i < selected.size(); i++) {
-                            int current = selected.get(i);
-                            if (current > c) {
-                                selected.set(i, current - 1);
-                                notifyItemChanged(i);
-                            }
+                        int c = selected.indexOf(getAdapterPosition());
+                        selected.remove(c);
+                        for (int i = c; i < selected.size(); i++) {
+                            notifyItemChanged(selected.get(i));
                         }
-                        selected.set(getAdapterPosition(), 0);
                     }
                     spring.setEndValue(endValue);
                     notifyItemChanged(getAdapterPosition());
