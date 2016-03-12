@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
 import com.veyndan.generic.R;
-import com.veyndan.generic.attach.AttachPhotoBottomSheetDialogFragment;
+import com.veyndan.generic.attach.PhotosFragment;
 import com.veyndan.generic.home.data.FirebaseAdapterRecyclerAdapter;
 import com.veyndan.generic.util.LogUtils;
 
@@ -130,7 +130,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_picture:
-                        BottomSheetDialogFragment bottomSheetDialogFragment = new AttachPhotoBottomSheetDialogFragment();
+                        BottomSheetDialogFragment bottomSheetDialogFragment = new PhotosFragment();
                         bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 
                         return true;

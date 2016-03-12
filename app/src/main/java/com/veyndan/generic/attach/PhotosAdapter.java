@@ -24,10 +24,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH>
+public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         implements ItemTouchHelperAdapter {
     @SuppressWarnings("unused")
-    private static final String TAG = LogUtils.makeLogTag(ImagesAdapter.class);
+    private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
     private static final float SPRING_SCALE = 0.72f;
 
@@ -41,7 +41,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH>
 
     private int counterMargin = 0;
 
-    public ImagesAdapter(Context context, List<String> imagePaths) {
+    public PhotosAdapter(Context context, List<String> imagePaths) {
         this.context = context;
         this.imagePaths = imagePaths;
 

@@ -15,7 +15,7 @@ import com.veyndan.generic.R;
 import com.veyndan.generic.attach.util.Gallery;
 import com.veyndan.generic.util.UIUtils;
 
-public class AttachPhotoBottomSheetDialogFragment extends BottomSheetDialogFragment {
+public class PhotosFragment extends BottomSheetDialogFragment {
 
     private static final int GRID_SPAN_COUNT = 3;
 
@@ -58,7 +58,7 @@ public class AttachPhotoBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         });
 
-        ImagesAdapter adapter = new ImagesAdapter(getContext(), Gallery.getImagesPath(getContext()));
+        PhotosAdapter adapter = new PhotosAdapter(getContext(), Gallery.getImagesPath(getContext()));
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
