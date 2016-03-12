@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -64,17 +67,76 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
         if (hide) {
             if (selected.contains(position)) {
                 TranslateAnimation animation = new TranslateAnimation(
-                        0, location[0] - holder.itemView.getX() - 30,
-                        0, location[1] - holder.itemView.getY() - 30
+                        0, location[0] - holder.itemView.getX(),
+                        0, location[1] - holder.itemView.getY()
                 );
+                animation.setInterpolator(new DecelerateInterpolator(4));
                 animation.setDuration(context.getResources().getInteger(android.R.integer.config_longAnimTime));
                 animation.setFillAfter(true);
                 holder.itemView.startAnimation(animation);
             } else {
-                holder.itemView.setVisibility(View.INVISIBLE);
+                AlphaAnimation animation = new AlphaAnimation(1, 0);
+                animation.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        holder.itemView.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                holder.itemView.setAnimation(animation);
             }
         } else {
-            holder.itemView.setVisibility(View.VISIBLE);
+            if (selected.contains(position) && holder.itemView.getAnimation() != null) {
+                TranslateAnimation animation = new TranslateAnimation(
+                        location[0] - holder.itemView.getX(), 0,
+                        location[1] - holder.itemView.getY(), 0
+                );
+                animation.setInterpolator(new DecelerateInterpolator(4));
+                animation.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
+                animation.setFillAfter(true);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        holder.itemView.setAnimation(null);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                holder.itemView.startAnimation(animation);
+            }
+            if (holder.itemView.getVisibility() == View.INVISIBLE) {
+                AlphaAnimation animation = new AlphaAnimation(0, 1);
+                animation.setDuration(context.getResources().getInteger(android.R.integer.config_shortAnimTime));
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        holder.itemView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                holder.itemView.setAnimation(animation);
+            }
             Glide.with(context).loadFromMediaStore(
                     Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
             float scale;
@@ -173,8 +235,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
         @Override
         public void onItemClear() {
             hide = false;
-            location[0] = 0;
-            location[1] = 0;
             for (int i = 0; i < getItemCount(); i++) {
                 if (getAdapterPosition() != i) notifyItemChanged(i);
             }
