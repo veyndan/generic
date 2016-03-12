@@ -81,8 +81,8 @@ public abstract class FirebaseAdapterRecyclerAdapter<T, VH extends RecyclerView.
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(FirebaseAdapterRecyclerAdapter.class);
 
-    Class<T> modelClass;
-    FirebaseArray snapshots;
+    final Class<T> modelClass;
+    final FirebaseArray snapshots;
 
     /**
      * @param modelClass      Firebase will marshall the data at a location into an instance of a class that you provide

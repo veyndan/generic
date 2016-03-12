@@ -10,6 +10,7 @@ public class Note {
     private String profile;
     private List<Description> descriptions;
 
+    @SuppressWarnings("unused")
     public Note() {
         // empty default constructor, necessary for Firebase to be able to deserialize notes
     }
@@ -94,6 +95,7 @@ public class Note {
         private String body;
         private int type;
 
+        @SuppressWarnings("unused")
         public Description() {
             // empty default constructor, necessary for Firebase to be able to deserialize descriptions
         }

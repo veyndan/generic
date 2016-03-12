@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
@@ -179,6 +178,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         otherMenu.getMenuInflater().inflate(R.menu.menu_other, otherMenu.getMenu());
 
         // Force show icon
+        //noinspection TryWithIdenticalCatches
         try {
             Field fieldPopup = otherMenu.getClass().getDeclaredField("mPopup");
             fieldPopup.setAccessible(true);
@@ -257,7 +257,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         final TextView about;
         final Button pins;
         final LinearLayout description;
-        final ToggleButton heart, code, basket;
         final AppCompatImageButton other, more;
 
         public VHContent(View v, Context context) {
@@ -265,9 +264,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             about = (TextView) v.findViewById(R.id.about);
             pins = (Button) v.findViewById(R.id.pins);
             description = (LinearLayout) v.findViewById(R.id.description);
-            heart = (ToggleButton) v.findViewById(R.id.heart);
-            code = (ToggleButton) v.findViewById(R.id.code);
-            basket = (ToggleButton) v.findViewById(R.id.basket);
             other = (AppCompatImageButton) v.findViewById(R.id.other);
             more = (AppCompatImageButton) v.findViewById(R.id.more);
 

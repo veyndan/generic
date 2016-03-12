@@ -9,6 +9,7 @@
     <string name="post">Post</string>
     <string name="text">Text</string>
     <string name="reminder">Reminder</string>
+    <string name="hint_description">Say something…</string>
     <plurals name="pins">
         <item quantity="one">%d Pin</item>
         <item quantity="other">%s Pins</item>

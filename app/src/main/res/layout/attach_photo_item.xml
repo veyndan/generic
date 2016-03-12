@@ -3,6 +3,7 @@
 <!-- Wrapped in SquareFrameLayout as when image scaled down, pressing the container will
 deselect the image as well-->
 <com.veyndan.generic.ui.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:background="@android:color/transparent">
@@ -11,7 +12,8 @@ deselect the image as well-->
         android:id="@+id/item_attach_camera_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/item_attach_camera_count"
@@ -19,7 +21,7 @@ deselect the image as well-->
         android:layout_height="24dp"
         android:layout_alignTop="@id/item_attach_camera_image"
         android:background="@drawable/attach_select_circle"
-        android:elevation="4dp"
+        android:elevation="2dp"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_xsmall"

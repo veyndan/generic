@@ -19,7 +19,7 @@ public class AttachPhotoBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     private static final int GRID_SPAN_COUNT = 3;
 
-    private BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+    private final BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {

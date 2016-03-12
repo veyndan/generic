@@ -29,18 +29,18 @@ public class MainActivity extends BaseActivity {
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items
         ViewPager viewPager = (HackyViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager()));
-
-        // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
-
-        // Must do setupWithViewPager before setting icons
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            TabLayout.Tab tab = tabLayout.getTabAt(i);
-            if (tab != null) {
-                tab.setIcon(R.drawable.ic_home_24dp);
+        if (viewPager != null && tabLayout != null) {
+            viewPager.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager()));
+            tabLayout.setupWithViewPager(viewPager);
+            // Must do setupWithViewPager before setting icons
+            for (int i = 0; i < tabLayout.getTabCount(); i++) {
+                TabLayout.Tab tab = tabLayout.getTabAt(i);
+                if (tab != null) {
+                    tab.setIcon(R.drawable.ic_home_24dp);
+                }
             }
+
         }
     }
 

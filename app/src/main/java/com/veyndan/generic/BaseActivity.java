@@ -1,9 +1,11 @@
 package com.veyndan.generic;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+@SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
