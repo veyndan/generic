@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.attach;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;

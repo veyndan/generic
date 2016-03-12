@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.client.Firebase;
+import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
 
 public class HomeFragment extends Fragment {

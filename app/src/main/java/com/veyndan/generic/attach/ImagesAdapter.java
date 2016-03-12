@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.attach;
 
 import android.content.Context;
 import android.net.Uri;
@@ -16,6 +16,7 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
 

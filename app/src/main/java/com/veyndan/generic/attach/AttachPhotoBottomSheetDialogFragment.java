@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.attach;
 
 import android.app.Dialog;
 import android.support.annotation.NonNull;
@@ -11,8 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
-import com.veyndan.generic.ui.Gallery;
-import com.veyndan.generic.ui.GridSpacingItemDecoration;
+import com.veyndan.generic.R;
+import com.veyndan.generic.attach.util.Gallery;
 import com.veyndan.generic.util.UIUtils;
 
 public class AttachPhotoBottomSheetDialogFragment extends BottomSheetDialogFragment {

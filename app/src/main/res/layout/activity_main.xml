@@ -5,7 +5,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.veyndan.generic.MainActivity">
+    tools:context=".home.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.veyndan.generic.HackyViewPager
+    <com.veyndan.generic.home.HackyViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

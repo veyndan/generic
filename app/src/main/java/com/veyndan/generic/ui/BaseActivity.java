@@ -1,9 +1,11 @@
-package com.veyndan.generic;
+package com.veyndan.generic.ui;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.veyndan.generic.R;
 
 @SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {

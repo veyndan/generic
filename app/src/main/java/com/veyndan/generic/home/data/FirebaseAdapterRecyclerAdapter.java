@@ -26,14 +26,14 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.veyndan.generic;
+package com.veyndan.generic.home.data;
 
 import android.support.v7.widget.RecyclerView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
-import com.veyndan.generic.ui.HeaderRecyclerAdapter;
+import com.veyndan.generic.home.HeaderRecyclerAdapter;
 import com.veyndan.generic.util.LogUtils;
 
 /**

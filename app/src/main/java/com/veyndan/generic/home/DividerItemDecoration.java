@@ -16,7 +16,7 @@
 
 // https://chromium.googlesource.com/android_tools/+/882ee91503f28d1fd60ba939c5b37db6b9d4ad29/sdk/extras/android/support/samples/Support7Demos/src/com/example/android/supportv7/widget/decorator/DividerItemDecoration.java
 
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import android.content.Context;
 import android.content.res.TypedArray;

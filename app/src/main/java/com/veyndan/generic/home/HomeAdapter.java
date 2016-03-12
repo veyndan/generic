@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,6 +23,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
+import com.veyndan.generic.R;
+import com.veyndan.generic.attach.AttachPhotoBottomSheetDialogFragment;
+import com.veyndan.generic.home.data.FirebaseAdapterRecyclerAdapter;
 import com.veyndan.generic.util.LogUtils;
 
 import java.lang.reflect.Field;

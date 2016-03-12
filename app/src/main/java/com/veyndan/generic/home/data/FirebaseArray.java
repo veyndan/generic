@@ -26,7 +26,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.veyndan.generic;
+package com.veyndan.generic.home.data;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;

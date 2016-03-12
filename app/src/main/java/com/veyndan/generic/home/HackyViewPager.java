@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.veyndan.generic.R;
+import com.veyndan.generic.ui.BaseActivity;
 import com.veyndan.generic.util.LogUtils;
 
 public class MainActivity extends BaseActivity {

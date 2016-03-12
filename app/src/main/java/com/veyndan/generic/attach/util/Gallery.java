@@ -1,4 +1,4 @@
-package com.veyndan.generic.ui;
+package com.veyndan.generic.attach.util;
 
 import android.content.Context;
 import android.database.Cursor;

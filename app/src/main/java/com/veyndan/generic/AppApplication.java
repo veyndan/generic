@@ -4,7 +4,7 @@ import android.app.Application;
 
 import com.firebase.client.Firebase;
 
-public class Generic extends Application {
+public class AppApplication extends Application {
 
     @Override
     public void onCreate() {

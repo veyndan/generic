@@ -1,4 +1,4 @@
-package com.veyndan.generic;
+package com.veyndan.generic.home;
 
 import java.util.List;
 

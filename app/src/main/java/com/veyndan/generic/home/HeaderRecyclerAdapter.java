@@ -1,4 +1,4 @@
-package com.veyndan.generic.ui;
+package com.veyndan.generic.home;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
