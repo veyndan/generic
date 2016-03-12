@@ -3,7 +3,6 @@ package com.veyndan.generic;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,11 +23,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
+public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH>
+        implements ItemTouchHelperAdapter {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(ImagesAdapter.class);
 
     private static final float SPRING_SCALE = 0.72f;
+
+    private boolean hide = false;
 
     private final Context context;
     private final List<String> imagePaths;
@@ -50,28 +52,33 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_attach_camera, parent, false);
+                .inflate(R.layout.attach_photo_item, parent, false);
         return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        Glide.with(context).loadFromMediaStore(
-                Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
-        float scale;
-        if (!selected.contains(position)) {
-            holder.count.setVisibility(View.GONE);
-            scale = 1f;
+        if (hide) {
+            holder.itemView.setVisibility(View.INVISIBLE);
         } else {
-            ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
-                    .setMargins(counterMargin, counterMargin, counterMargin, counterMargin);
-            holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
-            holder.count.setVisibility(View.VISIBLE);
-            scale = SPRING_SCALE;
-        }
-        if (holder.spring.isAtRest()) {
-            holder.image.setScaleX(scale);
-            holder.image.setScaleY(scale);
+            holder.itemView.setVisibility(View.VISIBLE);
+            Glide.with(context).loadFromMediaStore(
+                    Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
+            float scale;
+            if (!selected.contains(position)) {
+                holder.count.setVisibility(View.GONE);
+                scale = 1f;
+            } else {
+                ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
+                        .setMargins(counterMargin, counterMargin, counterMargin, counterMargin);
+                holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
+                holder.count.setVisibility(View.VISIBLE);
+                scale = SPRING_SCALE;
+            }
+            if (holder.spring.isAtRest()) {
+                holder.image.setScaleX(scale);
+                holder.image.setScaleY(scale);
+            }
         }
     }
 
@@ -80,7 +87,12 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
         return imagePaths.size();
     }
 
-    public class VH extends RecyclerView.ViewHolder {
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+
+    }
+
+    public class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
@@ -97,7 +109,6 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                 itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public boolean onPreDraw() {
-                        Log.d(TAG, "onPreDraw: ");
                         counterMargin = (int) ((itemView.getWidth() * (1.0f - SPRING_SCALE)) / 2 - UIUtils.dpToPx(context, 8));
                         itemView.getViewTreeObserver().removeOnPreDrawListener(this);
                         return true;
@@ -139,6 +150,22 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.VH> {
                     notifyItemChanged(getAdapterPosition());
                 }
             });
+        }
+
+        @Override
+        public void onItemSelected() {
+            hide = true;
+            for (Integer i = 0; i < getItemCount(); i++) {
+                if (!selected.contains(i)) notifyItemChanged(i);
+            }
+        }
+
+        @Override
+        public void onItemClear() {
+            hide = false;
+            for (Integer i = 0; i < getItemCount(); i++) {
+                if (!selected.contains(i)) notifyItemChanged(i);
+            }
         }
     }
 }
