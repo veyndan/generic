@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,14 +25,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
-        implements ItemTouchHelperAdapter {
+public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
     private static final float SPRING_SCALE = 0.72f;
 
     private boolean hide = false;
+
+    private float location[] = new float[2];
 
     private final Context context;
     private final List<String> imagePaths;
@@ -58,9 +60,19 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     }
 
     @Override
-    public void onBindViewHolder(VH holder, int position) {
+    public void onBindViewHolder(final VH holder, int position) {
         if (hide) {
-            holder.itemView.setVisibility(View.INVISIBLE);
+            if (selected.contains(position)) {
+                TranslateAnimation animation = new TranslateAnimation(
+                        0, location[0] - holder.itemView.getX() - 30,
+                        0, location[1] - holder.itemView.getY() - 30
+                );
+                animation.setDuration(context.getResources().getInteger(android.R.integer.config_longAnimTime));
+                animation.setFillAfter(true);
+                holder.itemView.startAnimation(animation);
+            } else {
+                holder.itemView.setVisibility(View.INVISIBLE);
+            }
         } else {
             holder.itemView.setVisibility(View.VISIBLE);
             Glide.with(context).loadFromMediaStore(
@@ -86,11 +98,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     @Override
     public int getItemCount() {
         return imagePaths.size();
-    }
-
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-
     }
 
     public class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -156,16 +163,20 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @Override
         public void onItemSelected() {
             hide = true;
-            for (Integer i = 0; i < getItemCount(); i++) {
-                if (!selected.contains(i)) notifyItemChanged(i);
+            location[0] = itemView.getX();
+            location[1] = itemView.getY();
+            for (int i = 0; i < getItemCount(); i++) {
+                if (getAdapterPosition() != i) notifyItemChanged(i);
             }
         }
 
         @Override
         public void onItemClear() {
             hide = false;
-            for (Integer i = 0; i < getItemCount(); i++) {
-                if (!selected.contains(i)) notifyItemChanged(i);
+            location[0] = 0;
+            location[1] = 0;
+            for (int i = 0; i < getItemCount(); i++) {
+                if (getAdapterPosition() != i) notifyItemChanged(i);
             }
         }
     }
