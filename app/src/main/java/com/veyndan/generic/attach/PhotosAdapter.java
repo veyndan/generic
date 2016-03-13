@@ -48,7 +48,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     private int counterMargin = 0;
 
-    private List<View> selectedItemViews;
+    private List<RecyclerView.ViewHolder> selectedItemViews;
 
     private int longPressed = -1;
 
@@ -77,6 +77,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public void onBindViewHolder(final VH holder, int position) {
         if (longPressed != -1) {
             if (longPressed == position) {
+                holder.count.setVisibility(View.VISIBLE);
                 holder.count.setText(String.valueOf(selected.size()));
             } else if (selected.contains(position)) {
                 TranslateAnimation animation = new TranslateAnimation(
@@ -89,11 +90,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 holder.itemView.setAlpha(0.7f);
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
-                selectedItemViews.add(holder.itemView);
-                holder.setIsRecyclable(false);
+                selectedItemViews.add(holder);
             }
         } else {
-            holder.setIsRecyclable(true);
             if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
                 TranslateAnimation animation = new TranslateAnimation(
                         location[0] - holder.itemView.getX(), 0,
@@ -135,9 +134,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         viewHolder.itemView.setTranslationX(dX);
         viewHolder.itemView.setTranslationY(dY);
-        for (View view : selectedItemViews) {
-            view.setTranslationX(dX);
-            view.setTranslationY(dY);
+        for (RecyclerView.ViewHolder view : selectedItemViews) {
+            view.itemView.setTranslationX(dX);
+            view.itemView.setTranslationY(dY);
         }
         viewHolder.itemView.bringToFront();
     }
@@ -146,12 +145,14 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
+        final View itemView;
         final ImageView image;
         final TextView count;
         final Spring spring;
 
         public VH(final View itemView) {
             super(itemView);
+            this.itemView = itemView;
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
@@ -204,6 +205,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
         @Override
         public void onItemSelected() {
+            if (!selected.contains(getAdapterPosition())) {
+                spring.setCurrentValue(0, true);
+                spring.setEndValue(1);
+                selected.add(getAdapterPosition());
+            }
             location[0] = itemView.getX();
             location[1] = itemView.getY();
             longPressed = getAdapterPosition();
