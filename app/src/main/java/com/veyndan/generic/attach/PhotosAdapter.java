@@ -21,6 +21,9 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
@@ -51,6 +54,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     private int counterMargin = 0;
 
+    private List<VH> selectedItemViews;
+
     private int longPressed = -1;
 
     public PhotosAdapter(Context context, List<String> imagePaths) {
@@ -61,9 +66,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
         springSystem = SpringSystem.create();
 
-        durationCollapse = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+        durationCollapse = context.getResources().getInteger(android.R.integer.config_mediumAnimTime);
         durationShort = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
         interpolatorCollapse = new DecelerateInterpolator(4);
+
+        selectedItemViews = new ArrayList<>();
     }
 
     @Override
@@ -77,21 +84,35 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public void onBindViewHolder(final VH holder, int position) {
         if (longPressed != -1) {
             if (longPressed == position) {
-                holder.collapse.setVisibility(View.VISIBLE);
                 holder.count.setVisibility(View.VISIBLE);
                 holder.count.setText(String.valueOf(selected.size()));
             } else if (selected.contains(position)) {
-                TranslateAnimation animation = new TranslateAnimation(
-                        0, location[0] - holder.itemView.getX(),
-                        0, location[1] - holder.itemView.getY());
-                animation.setInterpolator(interpolatorCollapse);
-                animation.setDuration(durationCollapse);
-                animation.setFillAfter(true);
-                holder.itemView.startAnimation(animation);
-                holder.image.animate().alpha(0);
+                float x = location[0] - holder.itemView.getX();
+                float y = location[1] - holder.itemView.getY();
+
+                TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
+                translate.setInterpolator(interpolatorCollapse);
+                translate.setDuration(durationCollapse);
+                translate.setFillAfter(true);
+                holder.itemView.startAnimation(translate);
+
+                List<Integer> list = Ordering.natural().greatestOf(
+                        Collections2.filter(selected, new Predicate<Integer>() {
+                            @Override
+                            public boolean apply(Integer input) {
+                                return input != longPressed;
+                            }
+                        }), 3);
+
+                holder.image.animate()
+                        .rotation(list.contains(position) ? 8 * (list.indexOf(position) + 1) : 24)
+                        .alpha(list.contains(position) ? 0.6f : 1)
+                        .setInterpolator(interpolatorCollapse)
+                        .setDuration(durationCollapse);
+
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
-                holder.collapse.setVisibility(View.INVISIBLE);
+                selectedItemViews.add(holder);
             } else {
                 ObjectAnimator
                         .ofFloat(holder.itemView, View.ALPHA, 0f)
@@ -99,17 +120,24 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                         .start();
             }
         } else {
-            holder.collapse.setVisibility(View.INVISIBLE);
-            holder.image.setAlpha(1f);
             if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
-                TranslateAnimation animation = new TranslateAnimation(
-                        location[0] - holder.itemView.getX(), 0,
-                        location[1] - holder.itemView.getY(), 0);
+                float x = location[0] - holder.itemView.getX();
+                float y = location[1] - holder.itemView.getY();
+
+                TranslateAnimation animation = new TranslateAnimation(x, 0, y, 0);
                 animation.setInterpolator(interpolatorCollapse);
                 animation.setDuration(durationCollapse);
                 animation.setFillAfter(true);
                 holder.itemView.startAnimation(animation);
+
+                holder.image.animate()
+                        .rotation(0)
+                        .alpha(1)
+                        .setInterpolator(interpolatorCollapse)
+                        .setDuration(durationCollapse);
+
                 holder.itemView.setTag(null);
+                selectedItemViews.clear();
             }
             ObjectAnimator
                     .ofFloat(holder.itemView, View.ALPHA, 1f)
@@ -145,6 +173,10 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
         viewHolder.itemView.setTranslationX(dX);
         viewHolder.itemView.setTranslationY(dY);
+        for (VH holder : selectedItemViews) {
+            holder.itemView.setTranslationX(dX);
+            holder.itemView.setTranslationY(dY);
+        }
         viewHolder.itemView.bringToFront();
     }
 
@@ -152,14 +184,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
-        final ImageView collapse;
         final ImageView image;
         final TextView count;
         final Spring spring;
 
         public VH(final View itemView) {
             super(itemView);
-            collapse = (ImageView) itemView.findViewById(R.id.item_attach_camera_collapse);
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 

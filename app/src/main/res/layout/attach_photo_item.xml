@@ -9,12 +9,6 @@ deselect the image as well-->
     android:background="@android:color/transparent">
 
     <ImageView
-        android:id="@+id/item_attach_camera_collapse"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/stack" />
-
-    <ImageView
         android:id="@+id/item_attach_camera_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
