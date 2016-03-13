@@ -13,9 +13,12 @@ import android.view.View;
 
 import com.veyndan.generic.R;
 import com.veyndan.generic.attach.util.Gallery;
+import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
 
 public class PhotosFragment extends BottomSheetDialogFragment {
+    @SuppressWarnings("unused")
+    private static final String TAG = LogUtils.makeLogTag(PhotosFragment.class);
 
     private static final int GRID_SPAN_COUNT = 3;
 

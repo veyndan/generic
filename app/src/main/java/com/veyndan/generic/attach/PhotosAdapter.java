@@ -82,21 +82,16 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     @Override
     public void onBindViewHolder(final VH holder, int position) {
+        final float x = location[0] - holder.itemView.getX();
+        final float y = location[1] - holder.itemView.getY();
         if (longPressed != -1) {
             if (longPressed == position) {
                 holder.count.setVisibility(View.VISIBLE);
                 holder.count.setText(String.valueOf(selected.size()));
             } else if (selected.contains(position)) {
-                float x = location[0] - holder.itemView.getX();
-                float y = location[1] - holder.itemView.getY();
 
-                TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
-                translate.setInterpolator(interpolatorCollapse);
-                translate.setDuration(durationCollapse);
-                translate.setFillAfter(true);
-                holder.itemView.startAnimation(translate);
-
-                List<Integer> list = Ordering.natural().greatestOf(
+                // Max 3 values of selected excluding longPressed
+                final List<Integer> list = Ordering.natural().greatestOf(
                         Collections2.filter(selected, new Predicate<Integer>() {
                             @Override
                             public boolean apply(Integer input) {
@@ -104,15 +99,26 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                             }
                         }), 3);
 
+                TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
+                translate.setInterpolator(interpolatorCollapse);
+                translate.setDuration(durationCollapse);
+                translate.setFillAfter(true);
+                holder.itemView.startAnimation(translate);
+
                 holder.image.animate()
                         .rotation(list.contains(position) ? 8 * (list.indexOf(position) + 1) : 24)
-                        .alpha(list.contains(position) ? 0.6f : 1)
+                        .alpha(list.contains(position) ? 0.6f : 0)
                         .setInterpolator(interpolatorCollapse)
                         .setDuration(durationCollapse);
 
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
-                selectedItemViews.add(holder);
+
+                // TODO selectedItemViews probably causing a lot of UI and performance issues
+                // Somehow attach underlay to top view, as only need images, removing the need
+                // for this. Similar to the previous commit one with an xml file, but instead
+                // dynamically do a similar thing.
+                if (list.contains(holder.getAdapterPosition())) selectedItemViews.add(holder);
             } else {
                 ObjectAnimator
                         .ofFloat(holder.itemView, View.ALPHA, 0f)
@@ -121,9 +127,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             }
         } else {
             if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
-                float x = location[0] - holder.itemView.getX();
-                float y = location[1] - holder.itemView.getY();
-
                 TranslateAnimation animation = new TranslateAnimation(x, 0, y, 0);
                 animation.setInterpolator(interpolatorCollapse);
                 animation.setDuration(durationCollapse);
@@ -137,6 +140,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                         .setDuration(durationCollapse);
 
                 holder.itemView.setTag(null);
+
                 selectedItemViews.clear();
             }
             ObjectAnimator
@@ -248,8 +252,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 spring.setCurrentValue(0, true);
                 spring.setEndValue(1);
             }
-            location[0] = itemView.getX();
-            location[1] = itemView.getY();
+            location[0] = itemView.getLeft();
+            location[1] = itemView.getTop();
             longPressed = getAdapterPosition();
             notifyItemRangeChanged(0, getItemCount());
         }
