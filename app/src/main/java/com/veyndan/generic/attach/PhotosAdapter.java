@@ -1,5 +1,6 @@
 package com.veyndan.generic.attach;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.net.Uri;
@@ -34,7 +35,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
     private static final float SPRING_SCALE = 0.72f;
-    private static int collapseDuration;
+    private final int collapseDuration;
+    private final int durationShort;
 
     private Interpolator collapseInterpolator;
 
@@ -61,6 +63,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         springSystem = SpringSystem.create();
 
         collapseDuration = context.getResources().getInteger(android.R.integer.config_mediumAnimTime);
+        durationShort = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
         collapseInterpolator = new DecelerateInterpolator(4);
 
         selectedItemViews = new ArrayList<>();
@@ -91,6 +94,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
                 selectedItemViews.add(holder);
+            } else {
+                ObjectAnimator
+                        .ofFloat(holder.itemView, View.ALPHA, 0f)
+                        .setDuration(durationShort)
+                        .start();
             }
         } else {
             if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
@@ -104,7 +112,10 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 holder.itemView.setTag(null);
                 selectedItemViews.clear();
             }
-            holder.itemView.setAlpha(1f);
+            ObjectAnimator
+                    .ofFloat(holder.itemView, View.ALPHA, 1f)
+                    .setDuration(durationShort)
+                    .start();
             Glide.with(context).loadFromMediaStore(
                     Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
             float scale;
@@ -145,14 +156,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
-        final View itemView;
         final ImageView image;
         final TextView count;
         final Spring spring;
 
         public VH(final View itemView) {
             super(itemView);
-            this.itemView = itemView;
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
@@ -206,10 +215,13 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @Override
         public void onItemSelected() {
             if (!selected.contains(getAdapterPosition())) {
-                spring.setCurrentValue(0, true);
-                spring.setEndValue(1);
                 selected.add(getAdapterPosition());
+            } else {
+                spring.setCurrentValue(1, true);
+                spring.setEndValue(0);
             }
+            spring.setCurrentValue(0, true);
+            spring.setEndValue(1);
             location[0] = itemView.getX();
             location[1] = itemView.getY();
             longPressed = getAdapterPosition();
