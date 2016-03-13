@@ -35,10 +35,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
     private static final float SPRING_SCALE = 0.72f;
-    /**
-     * The offset for stacking effect of images when grouped.
-     */
-    private final float collapseOffset;
 
     private final int durationCollapse;
     private final int durationShort;
@@ -55,25 +51,19 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     private int counterMargin = 0;
 
-    private List<VH> selectedItemViews;
-
     private int longPressed = -1;
 
     public PhotosAdapter(Context context, List<String> imagePaths) {
         this.context = context;
         this.imagePaths = imagePaths;
 
-        collapseOffset = UIUtils.dpToPx(context, 8);
-
         selected = new ArrayList<>(imagePaths.size());
 
         springSystem = SpringSystem.create();
 
-        durationCollapse = context.getResources().getInteger(android.R.integer.config_mediumAnimTime);
+        durationCollapse = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
         durationShort = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
         interpolatorCollapse = new DecelerateInterpolator(4);
-
-        selectedItemViews = new ArrayList<>();
     }
 
     @Override
@@ -87,36 +77,21 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public void onBindViewHolder(final VH holder, int position) {
         if (longPressed != -1) {
             if (longPressed == position) {
+                holder.collapse.setVisibility(View.VISIBLE);
                 holder.count.setVisibility(View.VISIBLE);
                 holder.count.setText(String.valueOf(selected.size()));
             } else if (selected.contains(position)) {
-                float x = location[0] - holder.itemView.getX();
-                float y = location[1] - holder.itemView.getY();
-                float yOffset = collapseOffset;
-                float xOffset = collapseOffset;
-                if (x == 0) {
-                    xOffset = 0;
-                } else if (Math.signum(x) == 1) {
-                    xOffset *= -1;
-                }
-                if (y == 0) {
-                    yOffset = 0;
-                } else if (Math.signum(location[1] - holder.itemView.getY()) == 1) {
-                    yOffset *= -1;
-                }
                 TranslateAnimation animation = new TranslateAnimation(
-                        0, x + xOffset,
-                        0, y + yOffset);
+                        0, location[0] - holder.itemView.getX(),
+                        0, location[1] - holder.itemView.getY());
                 animation.setInterpolator(interpolatorCollapse);
                 animation.setDuration(durationCollapse);
                 animation.setFillAfter(true);
                 holder.itemView.startAnimation(animation);
-                holder.itemView.setAlpha(0.52f);
+                holder.image.animate().alpha(0);
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
-                selectedItemViews.add(holder);
-
-                UIUtils.grayscale(holder.image);
+                holder.collapse.setVisibility(View.INVISIBLE);
             } else {
                 ObjectAnimator
                         .ofFloat(holder.itemView, View.ALPHA, 0f)
@@ -124,6 +99,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                         .start();
             }
         } else {
+            holder.collapse.setVisibility(View.INVISIBLE);
+            holder.image.setAlpha(1f);
             if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
                 TranslateAnimation animation = new TranslateAnimation(
                         location[0] - holder.itemView.getX(), 0,
@@ -133,7 +110,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 animation.setFillAfter(true);
                 holder.itemView.startAnimation(animation);
                 holder.itemView.setTag(null);
-                selectedItemViews.clear();
             }
             ObjectAnimator
                     .ofFloat(holder.itemView, View.ALPHA, 1f)
@@ -169,10 +145,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
         viewHolder.itemView.setTranslationX(dX);
         viewHolder.itemView.setTranslationY(dY);
-        for (VH holder : selectedItemViews) {
-            holder.itemView.setTranslationX(dX);
-            holder.itemView.setTranslationY(dY);
-        }
         viewHolder.itemView.bringToFront();
     }
 
@@ -180,12 +152,14 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
+        final ImageView collapse;
         final ImageView image;
         final TextView count;
         final Spring spring;
 
         public VH(final View itemView) {
             super(itemView);
+            collapse = (ImageView) itemView.findViewById(R.id.item_attach_camera_collapse);
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
