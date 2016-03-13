@@ -19,7 +19,6 @@ deselect the image as well-->
         android:id="@+id/item_attach_camera_count"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_alignTop="@id/item_attach_camera_image"
         android:background="@drawable/attach_select_circle"
         android:elevation="2dp"
         android:gravity="center"
