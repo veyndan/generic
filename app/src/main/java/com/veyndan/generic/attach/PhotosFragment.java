@@ -16,6 +16,9 @@ import com.veyndan.generic.attach.util.Gallery;
 import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * TODO Set column count depending on screen width
  */
@@ -64,11 +67,19 @@ public class PhotosFragment extends BottomSheetDialogFragment {
             }
         });
 
-        PhotosAdapter adapter = new PhotosAdapter(getContext(), Gallery.getImagesPath(getContext()));
+        PhotosAdapter adapter = new PhotosAdapter(getContext(), init());
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    public List<Photo> init() {
+        List<Photo> photos = new ArrayList<>();
+        for (String path : Gallery.getImagesPath(getContext())) {
+            photos.add(new Photo(path));
+        }
+        return photos;
     }
 
 }

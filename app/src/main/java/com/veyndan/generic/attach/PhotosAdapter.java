@@ -59,7 +59,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     private float location[] = new float[2];
 
     private final Context context;
-    private final List<String> imagePaths;
+    private final List<Photo> photos;
     private final List<Integer> selected;
 
     private final SpringSystem springSystem;
@@ -68,11 +68,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     private int longPressed = -1;
 
-    public PhotosAdapter(Context context, List<String> imagePaths) {
+    public PhotosAdapter(Context context, List<Photo> photos) {
         this.context = context;
-        this.imagePaths = imagePaths;
+        this.photos = photos;
 
-        selected = new ArrayList<>(imagePaths.size());
+        selected = new ArrayList<>(photos.size());
 
         springSystem = SpringSystem.create();
 
@@ -151,7 +151,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                     .alpha(1)
                     .setDuration(durationShort);
             Glide.with(context).loadFromMediaStore(
-                    Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
+                    Uri.fromFile(new File(photos.get(position).getPath()))).into(holder.image);
             float scale;
             if (!selected.contains(position)) {
                 holder.count.setVisibility(View.GONE);
@@ -170,13 +170,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     @Override
     public int getItemCount() {
-        return imagePaths.size();
+        return photos.size();
     }
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder
-            viewHolder,
-                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         viewHolder.itemView.setTranslationX(dX);
         viewHolder.itemView.setTranslationY(dY);
         for (VH holder : selectedItemViews) {
