@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,6 +99,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         } else if (longPressed != -1) {
             if (photos.get(position).isSelected()) {
 
+                // TODO Gives right elements but not in correct order (reason is using .contains)
                 List<Integer> list1 = new ArrayList<>();
                 for (Photo photo : photos) {
                     list1.add(photo.getCount());
@@ -109,8 +109,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 for (int i = 0; i < photos.size(); i++) {
                     if (list1.contains(photos.get(i).getCount())) list.add(i);
                 }
-
-                Log.d(TAG, "onBindViewHolder: " + list);
 
                 TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
                 translate.setInterpolator(interpolatorCollapse);
