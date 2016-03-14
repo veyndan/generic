@@ -13,7 +13,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -37,7 +36,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
-    private static final float SPRING_SCALE = 0.72f;
+    private float springScale = 0;
 
     private final int durationCollapse;
     private final int durationShort;
@@ -51,8 +50,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     private final List<Integer> selected;
 
     private final SpringSystem springSystem;
-
-    private int counterMargin = 0;
 
     private List<VH> selectedItemViews;
 
@@ -154,11 +151,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 holder.count.setVisibility(View.GONE);
                 scale = 1f;
             } else {
-                ((RelativeLayout.LayoutParams) holder.count.getLayoutParams())
-                        .setMargins(counterMargin, counterMargin, counterMargin, counterMargin);
                 holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
                 holder.count.setVisibility(View.VISIBLE);
-                scale = SPRING_SCALE;
+                scale = springScale;
             }
             if (holder.spring.isAtRest()) {
                 holder.image.setScaleX(scale);
@@ -197,12 +192,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
             count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
 
-            if (counterMargin == 0) {
+            if (springScale == 0) {
                 itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public boolean onPreDraw() {
-                        counterMargin = (int) ((itemView.getWidth() *
-                                (1.0f - SPRING_SCALE)) / 2 - UIUtils.dpToPx(context, 8));
+                        float width = itemView.getWidth();
+                        springScale = (width - UIUtils.dpToPx(context, 32)) / width;
                         itemView.getViewTreeObserver().removeOnPreDrawListener(this);
                         return true;
                     }
@@ -218,7 +213,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 @Override
                 public void onSpringUpdate(Spring spring) {
                     float value = (float) spring.getCurrentValue();
-                    float scale = 1f - value * (1f - SPRING_SCALE);
+                    float scale = 1f - value * (1f - springScale);
                     image.setScaleX(scale);
                     image.setScaleY(scale);
                 }
