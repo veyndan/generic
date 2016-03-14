@@ -16,6 +16,9 @@ import com.veyndan.generic.attach.util.Gallery;
 import com.veyndan.generic.util.LogUtils;
 import com.veyndan.generic.util.UIUtils;
 
+/**
+ * TODO Set column count depending on screen width
+ */
 public class PhotosFragment extends BottomSheetDialogFragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosFragment.class);

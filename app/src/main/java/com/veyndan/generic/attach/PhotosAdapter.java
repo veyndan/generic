@@ -1,6 +1,5 @@
 package com.veyndan.generic.attach;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.net.Uri;
@@ -31,6 +30,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TODO selectedItemViews probably causing a lot of UI and performance issues
+ * Somehow attach underlay to top view, as only need images, removing the need
+ * for this. Similar to the previous commit one with an xml file, but instead
+ * dynamically do a similar thing.
+ * <p/>
+ * TODO Stop bringToFront() being called for top longPressed view every time it is moved.
+ * <p/>
+ * TODO Hide bottom sheet while maintaining 'hold' of selected photos into HomeFragment.
+ * <p/>
+ * TODO Show bottom sheet again if not dropped into note composition view.
+ * <p/>
+ * TODO Add to composition view if photos dropped in.
+ */
 public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         implements ItemTouchHelperAdapter {
     @SuppressWarnings("unused")
@@ -81,11 +94,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public void onBindViewHolder(final VH holder, int position) {
         final float x = location[0] - holder.itemView.getX();
         final float y = location[1] - holder.itemView.getY();
-        if (longPressed != -1) {
-            if (longPressed == position) {
-                holder.count.setVisibility(View.VISIBLE);
-                holder.count.setText(String.valueOf(selected.size()));
-            } else if (selected.contains(position)) {
+        if (longPressed == position) {
+            holder.count.setVisibility(View.VISIBLE);
+            holder.count.setText(String.valueOf(selected.size()));
+        } else if (longPressed != -1) {
+            if (selected.contains(position)) {
 
                 // Max 3 values of selected excluding longPressed
                 final List<Integer> list = Ordering.natural().greatestOf(
@@ -111,19 +124,14 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 holder.itemView.setTag("anim");
                 holder.count.setVisibility(View.GONE);
 
-                // TODO selectedItemViews probably causing a lot of UI and performance issues
-                // Somehow attach underlay to top view, as only need images, removing the need
-                // for this. Similar to the previous commit one with an xml file, but instead
-                // dynamically do a similar thing.
                 if (list.contains(holder.getAdapterPosition())) selectedItemViews.add(holder);
             } else {
-                ObjectAnimator
-                        .ofFloat(holder.itemView, View.ALPHA, 0f)
-                        .setDuration(durationShort)
-                        .start();
+                holder.image.animate()
+                        .alpha(0)
+                        .setDuration(durationShort);
             }
         } else {
-            if (selected.contains(position) && "anim".equals(holder.itemView.getTag())) {
+            if ("anim".equals(holder.itemView.getTag())) {
                 TranslateAnimation animation = new TranslateAnimation(x, 0, y, 0);
                 animation.setInterpolator(interpolatorCollapse);
                 animation.setDuration(durationCollapse);
@@ -132,7 +140,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
                 holder.image.animate()
                         .rotation(0)
-                        .alpha(1)
                         .setInterpolator(interpolatorCollapse)
                         .setDuration(durationCollapse);
 
@@ -140,10 +147,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
                 selectedItemViews.clear();
             }
-            ObjectAnimator
-                    .ofFloat(holder.itemView, View.ALPHA, 1f)
-                    .setDuration(durationShort)
-                    .start();
+            holder.image.animate()
+                    .alpha(1)
+                    .setDuration(durationShort);
             Glide.with(context).loadFromMediaStore(
                     Uri.fromFile(new File(imagePaths.get(position)))).into(holder.image);
             float scale;
@@ -168,7 +174,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     }
 
     @Override
-    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder
+            viewHolder,
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
         viewHolder.itemView.setTranslationX(dX);
         viewHolder.itemView.setTranslationY(dY);
