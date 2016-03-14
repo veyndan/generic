@@ -20,8 +20,6 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Ordering;
 import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
@@ -61,7 +59,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     private final Context context;
     private final List<Photo> photos;
-    private final List<Integer> selected;
 
     private final SpringSystem springSystem;
 
@@ -72,8 +69,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
     public PhotosAdapter(Context context, List<Photo> photos) {
         this.context = context;
         this.photos = photos;
-
-        selected = new ArrayList<>(photos.size());
 
         springSystem = SpringSystem.create();
 
@@ -93,24 +88,29 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     @Override
     public void onBindViewHolder(final VH holder, int position) {
-        test(position);
-
         final float x = location[0] - holder.itemView.getX();
         final float y = location[1] - holder.itemView.getY();
         if (longPressed == position) {
             holder.count.setVisibility(View.VISIBLE);
-            holder.count.setText(String.valueOf(selected.size()));
+            int count = 0;
+            for (Photo photo : photos) {
+                if (photo.isSelected()) count++;
+            }
+            holder.count.setText(String.valueOf(count));
         } else if (longPressed != -1) {
-            if (selected.contains(position)) {
+            if (photos.get(position).isSelected()) {
 
-                // Max 3 values of selected excluding longPressed
-                final List<Integer> list = Ordering.natural().greatestOf(
-                        Collections2.filter(selected, new Predicate<Integer>() {
-                            @Override
-                            public boolean apply(Integer input) {
-                                return input != longPressed;
-                            }
-                        }), 3);
+                List<Integer> list1 = new ArrayList<>();
+                for (Photo photo : photos) {
+                    list1.add(photo.getCount());
+                }
+                list1 = Ordering.natural().greatestOf(list1, 3);
+                List<Integer> list = new ArrayList<>();
+                for (int i = 0; i < photos.size(); i++) {
+                    if (list1.contains(photos.get(i).getCount())) list.add(i);
+                }
+
+                Log.d(TAG, "onBindViewHolder: " + list);
 
                 TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
                 translate.setInterpolator(interpolatorCollapse);
@@ -156,13 +156,13 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             Glide.with(context).loadFromMediaStore(
                     Uri.fromFile(new File(photos.get(position).getPath()))).into(holder.image);
             float scale;
-            if (!selected.contains(position)) {
-                holder.count.setVisibility(View.GONE);
-                scale = 1f;
-            } else {
-                holder.count.setText(String.valueOf(selected.indexOf(position) + 1));
+            if (photos.get(position).isSelected()) {
+                holder.count.setText(String.valueOf(photos.get(position).getCount() + 1));
                 holder.count.setVisibility(View.VISIBLE);
                 scale = springScale;
+            } else {
+                holder.count.setVisibility(View.GONE);
+                scale = 1f;
             }
             if (holder.spring.isAtRest()) {
                 holder.image.setScaleX(scale);
@@ -186,17 +186,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             holder.itemView.setTranslationY(dY);
         }
         viewHolder.itemView.bringToFront();
-    }
-
-    public void test(int position) {
-        int a = selected.indexOf(position);
-        int b = photos.get(position).getCount();
-        List<Integer> list = new ArrayList<>();
-        if (a != b) {
-            Log.e(TAG, position + "\n" +
-                    "Expected: " + a + "    " + selected + "\n" +
-                    "Received: " + b + "    " + list);
-        }
     }
 
     public class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -242,36 +231,30 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!selected.contains(getAdapterPosition())) {
-                        spring.setCurrentValue(0, true);
-                        spring.setEndValue(1);
-                        selected.add(getAdapterPosition());
-
-                        // Photos
-                        int count = 0;
-                        for (Photo photo : photos) {
-                            if (photo.isSelected()) count++;
-                        }
-                        photos.get(getAdapterPosition()).setCount(count);
-                        //
-                    } else {
+                    if (photos.get(getAdapterPosition()).isSelected()) {
                         spring.setCurrentValue(1, true);
                         spring.setEndValue(0);
-                        int c = selected.indexOf(getAdapterPosition());
-                        selected.remove(c);
 
-                        // Photos
                         for (Photo photo : photos) {
                             if (photo.getCount() > photos.get(getAdapterPosition()).getCount()) {
                                 photo.setCount(photo.getCount() - 1);
                             }
                         }
                         photos.get(getAdapterPosition()).setCount(-1);
-                        //
 
-                        for (int i = c; i < selected.size(); i++) {
-                            notifyItemChanged(selected.get(i));
+                        for (int i = 0; i < photos.size(); i++) {
+                            if (photos.get(i).getCount() > photos.get(getAdapterPosition()).getCount())
+                                notifyItemChanged(i);
                         }
+                    } else {
+                        spring.setCurrentValue(0, true);
+                        spring.setEndValue(1);
+
+                        int count = 0;
+                        for (Photo photo : photos) {
+                            if (photo.isSelected()) count++;
+                        }
+                        photos.get(getAdapterPosition()).setCount(count);
                     }
                     notifyItemChanged(getAdapterPosition());
                 }
@@ -280,16 +263,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
         @Override
         public void onItemSelected() {
-            if (!selected.contains(getAdapterPosition())) {
-                selected.add(getAdapterPosition());
-
-                //Photos
+            if (!photos.get(getAdapterPosition()).isSelected()) {
                 int count = 0;
                 for (Photo photo : photos) {
                     if (photo.isSelected()) count++;
                 }
                 photos.get(getAdapterPosition()).setCount(count);
-                //
 
                 spring.setCurrentValue(0, true);
                 spring.setEndValue(1);
