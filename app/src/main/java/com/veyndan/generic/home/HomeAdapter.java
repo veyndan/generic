@@ -1,6 +1,5 @@
 package com.veyndan.generic.home;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -20,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
@@ -31,6 +31,9 @@ import com.veyndan.generic.util.LogUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapter.VH> {
     @SuppressWarnings("unused")
@@ -51,14 +54,14 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     protected VH onCreateHeaderItemViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_header, parent, false);
-        return new VHHeader(v, context);
+        return new VHHeader(v);
     }
 
     @Override
     protected VH onCreateContentItemViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_content, parent, false);
-        return new VHContent(v, context);
+        return new VHContent(v);
     }
 
     @Override
@@ -132,7 +135,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                     case R.id.action_picture:
                         BottomSheetDialogFragment bottomSheetDialogFragment = new PhotosFragment();
                         bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-
                         return true;
                     default:
                         return false;
@@ -151,9 +153,9 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
 
         try {
             int pinCount = Integer.parseInt(note.getPins());
-            vhContent.pins.setText(res.getQuantityString(R.plurals.pins, pinCount, pinCount));
+            vhContent.notes.setText(res.getQuantityString(R.plurals.notes, pinCount, pinCount));
         } catch (NumberFormatException e) {
-            vhContent.pins.setText(res.getQuantityString(R.plurals.pins, -1, note.getPins()));
+            vhContent.notes.setText(res.getQuantityString(R.plurals.notes, -1, note.getPins()));
         }
 
         for (Note.Description description : note.getDescriptions()) {
@@ -214,39 +216,34 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         });
     }
 
-    public static class VH extends RecyclerView.ViewHolder {
+    static class VH extends RecyclerView.ViewHolder {
         @SuppressWarnings("unused")
         private static final String TAG = LogUtils.makeLogTag(VH.class);
 
-        final LinearLayout description;
-        final TextView name;
-        final ImageView profile;
+        @Bind(R.id.description) LinearLayout description;
+        @Bind(R.id.name) TextView name;
+        @Bind(R.id.profile) ImageView profile;
 
         public VH(View v) {
             super(v);
-            description = (LinearLayout) v.findViewById(R.id.description);
-            name = (TextView) v.findViewById(R.id.name);
-            profile = (ImageView) v.findViewById(R.id.profile);
+            ButterKnife.bind(this, v);
         }
     }
 
-    public static class VHHeader extends VH {
+    static class VHHeader extends VH {
         @SuppressWarnings("unused")
         private static final String TAG = LogUtils.makeLogTag(VHContent.class);
 
-        final TextView date;
-        final Button post;
-        final Spinner visibility;
-        final AppCompatImageButton attach;
+        @Bind(R.id.date) TextView date;
+        @Bind(R.id.post) Button post;
+        @Bind(R.id.visibility) Spinner visibility;
+        @Bind(R.id.attach) AppCompatImageButton attach;
 
-        public VHHeader(View v, Context context) {
+        public VHHeader(View v) {
             super(v);
-            date = (TextView) v.findViewById(R.id.date);
-            post = (Button) v.findViewById(R.id.post);
-            visibility = (Spinner) v.findViewById(R.id.visibility);
-            attach = (AppCompatImageButton) v.findViewById(R.id.attach);
+            ButterKnife.bind(this, v);
 
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(v.getContext().getApplicationContext(),
                     R.array.visibility, R.layout.spinner_visibility);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             visibility.setAdapter(adapter);
@@ -257,27 +254,31 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         @SuppressWarnings("unused")
         private static final String TAG = LogUtils.makeLogTag(VHContent.class);
 
-        final TextView about;
-        final Button pins;
-        final LinearLayout description;
-        final AppCompatImageButton other, more;
+        @Bind(R.id.about) TextView about;
+        @Bind(R.id.notes) Button notes;
+        @Bind(R.id.description) LinearLayout description;
+        @Bind(R.id.other) AppCompatImageButton other;
+        @Bind(R.id.more) AppCompatImageButton more;
 
-        public VHContent(View v, Context context) {
+        public VHContent(final View v) {
             super(v);
-            about = (TextView) v.findViewById(R.id.about);
-            pins = (Button) v.findViewById(R.id.pins);
-            description = (LinearLayout) v.findViewById(R.id.description);
-            other = (AppCompatImageButton) v.findViewById(R.id.other);
-            more = (AppCompatImageButton) v.findViewById(R.id.more);
+            ButterKnife.bind(this, v);
 
             // Popup menu for QAB overflow
-            final PopupMenu menu = new PopupMenu(context, more);
+            final PopupMenu menu = new PopupMenu(v.getContext().getApplicationContext(), more);
             menu.getMenu().add("titleRes");
 
             more.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     menu.show();
+                }
+            });
+
+            notes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
                 }
             });
         }

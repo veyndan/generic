@@ -102,7 +102,7 @@
         app:srcCompat="@drawable/ic_more_horiz_24dp" />
 
     <Button
-        android:id="@+id/pins"
+        android:id="@+id/notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/heart"

@@ -54,7 +54,7 @@ public class Note {
                 "name='" + name + '\'' +
                 ", date='" + date + '\'' +
                 ", visibility='" + visibility + '\'' +
-                ", pins='" + pins + '\'' +
+                ", notes='" + pins + '\'' +
                 ", profile='" + profile + '\'' +
                 ", descriptions=" + descriptions +
                 '}';

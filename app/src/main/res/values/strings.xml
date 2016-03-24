@@ -10,9 +10,9 @@
     <string name="text">Text</string>
     <string name="reminder">Reminder</string>
     <string name="hint_description">Say something…</string>
-    <plurals name="pins">
-        <item quantity="one">%d Pin</item>
-        <item quantity="other">%s Pins</item>
+    <plurals name="notes">
+        <item quantity="one">%d Note</item>
+        <item quantity="other">%s Notes</item>
     </plurals>
 
     <string-array name="visibility">

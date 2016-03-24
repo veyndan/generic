@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,9 @@ import com.veyndan.generic.util.UIUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * TODO selectedItemViews probably causing a lot of UI and performance issues
@@ -87,6 +91,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     @Override
     public void onBindViewHolder(final VH holder, int position) {
+        Log.d(TAG, String.valueOf(durationCollapse));
         final float x = location[0] - holder.itemView.getX();
         final float y = location[1] - holder.itemView.getY();
         if (longPressed == position) {
@@ -190,14 +195,14 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
-        final ImageView image;
-        final TextView count;
+        @Bind(R.id.item_attach_camera_image) ImageView image;
+        @Bind(R.id.item_attach_camera_count) TextView count;
+
         final Spring spring;
 
         public VH(final View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(R.id.item_attach_camera_image);
-            count = (TextView) itemView.findViewById(R.id.item_attach_camera_count);
+            ButterKnife.bind(this, itemView);
 
             if (springScale == 0) {
                 itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
