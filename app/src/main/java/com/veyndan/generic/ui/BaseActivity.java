@@ -1,6 +1,5 @@
 package com.veyndan.generic.ui;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -8,15 +7,18 @@ import android.support.v7.widget.Toolbar;
 
 import com.veyndan.generic.R;
 
-import butterknife.Bind;
+import butterknife.ButterKnife;
 
-@SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity {
-    @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
+    @Nullable Toolbar toolbar;
 
+    @Nullable
     protected Toolbar getToolbar() {
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
+        if (toolbar == null) {
+            toolbar = ButterKnife.findById(this, R.id.toolbar);
+            if (toolbar != null) {
+                setSupportActionBar(toolbar);
+            }
         }
         return toolbar;
     }

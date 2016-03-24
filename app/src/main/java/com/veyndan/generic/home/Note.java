@@ -1,8 +1,12 @@
 package com.veyndan.generic.home;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Note {
+public class Note implements Parcelable {
     private String name;
     private String date;
     private String visibility;
@@ -88,11 +92,59 @@ public class Note {
         return result;
     }
 
-    public static class Description {
-        public static final int TYPE_PARAGRAPH = 0;
-        public static final int TYPE_IMAGE = 1;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(date);
+        dest.writeString(visibility);
+        dest.writeString(pins);
+        dest.writeString(profile);
+        if (descriptions == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(descriptions);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
+
+    protected Note(Parcel in) {
+        name = in.readString();
+        date = in.readString();
+        visibility = in.readString();
+        pins = in.readString();
+        profile = in.readString();
+        if (in.readByte() == 0x01) {
+            descriptions = new ArrayList<Description>();
+            in.readList(descriptions, Description.class.getClassLoader());
+        } else {
+            descriptions = null;
+        }
+    }
+
+    public static class Description implements Parcelable {
+        public static final int TYPE_PARAGRAPH = 0;
+
+        public static final int TYPE_IMAGE = 1;
         private String body;
+
         private int type;
 
         @SuppressWarnings("unused")
@@ -131,5 +183,34 @@ public class Note {
             result = 31 * result + type;
             return result;
         }
+
+        protected Description(Parcel in) {
+            body = in.readString();
+            type = in.readInt();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(body);
+            dest.writeInt(type);
+        }
+
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<Description> CREATOR = new Parcelable.Creator<Description>() {
+            @Override
+            public Description createFromParcel(Parcel in) {
+                return new Description(in);
+            }
+
+            @Override
+            public Description[] newArray(int size) {
+                return new Description[size];
+            }
+        };
     }
 }

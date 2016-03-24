@@ -1,5 +1,6 @@
 package com.veyndan.generic.home;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
+import com.veyndan.generic.NoteActivity;
 import com.veyndan.generic.R;
 import com.veyndan.generic.attach.PhotosFragment;
 import com.veyndan.generic.home.data.FirebaseAdapterRecyclerAdapter;
@@ -146,7 +148,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     @Override
     protected void onBindContentItemViewHolder(VH holder, final int position) {
         VHContent vhContent = (VHContent) holder;
-        Note note = getItem(position);
+        final Note note = getItem(position);
         Glide.with(context).load(note.getProfile()).into(vhContent.profile);
         vhContent.name.setText(note.getName());
         vhContent.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
@@ -214,6 +216,17 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                 }
             }
         });
+
+        vhContent.notes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
+                Intent view = new Intent(context, NoteActivity.class);
+                view.setAction(Intent.ACTION_VIEW);
+                view.putExtra("NOTE", note);
+                context.startActivity(view);
+            }
+        });
     }
 
     static class VH extends RecyclerView.ViewHolder {
@@ -256,7 +269,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
 
         @Bind(R.id.about) TextView about;
         @Bind(R.id.notes) Button notes;
-        @Bind(R.id.description) LinearLayout description;
         @Bind(R.id.other) AppCompatImageButton other;
         @Bind(R.id.more) AppCompatImageButton more;
 
@@ -272,13 +284,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                 @Override
                 public void onClick(View v) {
                     menu.show();
-                }
-            });
-
-            notes.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
                 }
             });
         }

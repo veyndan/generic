@@ -19,4 +19,5 @@
         <item>Public</item>
         <item>Private</item>
     </string-array>
+    <string name="title_activity_note">NoteActivity</string>
 </resources>
