@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,7 +90,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
     @Override
     public void onBindViewHolder(final VH holder, int position) {
-        Log.d(TAG, String.valueOf(durationCollapse));
         final float x = location[0] - holder.itemView.getX();
         final float y = location[1] - holder.itemView.getY();
         if (longPressed == position) {
@@ -191,7 +189,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         viewHolder.itemView.bringToFront();
     }
 
-    public class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+    class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
 
