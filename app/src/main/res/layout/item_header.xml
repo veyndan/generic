@@ -81,32 +81,6 @@
         android:layout_marginTop="8dp"
         android:drawableTop="@drawable/heart" />
 
-    <ToggleButton
-        android:id="@+id/code"
-        style="@style/ImageToggle"
-        android:layout_alignTop="@id/heart"
-        android:layout_toEndOf="@id/heart"
-        android:layout_toRightOf="@id/heart"
-        android:drawableTop="@drawable/code" />
-
-    <ToggleButton
-        android:id="@+id/basket"
-        style="@style/ImageToggle"
-        android:layout_alignBottom="@id/code"
-        android:layout_toEndOf="@id/code"
-        android:layout_toRightOf="@id/code"
-        android:drawableTop="@drawable/basket" />
-
-    <android.support.v7.widget.AppCompatImageButton
-        android:id="@+id/more"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignBottom="@id/basket"
-        android:layout_toEndOf="@id/basket"
-        android:layout_toRightOf="@id/basket"
-        android:background="?selectableItemBackgroundBorderless"
-        app:srcCompat="@drawable/ic_more_horiz_24dp" />
-
     <Button
         android:id="@+id/post"
         android:layout_width="wrap_content"

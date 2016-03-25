@@ -270,22 +270,10 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         @Bind(R.id.about) TextView about;
         @Bind(R.id.notes) Button notes;
         @Bind(R.id.other) AppCompatImageButton other;
-        @Bind(R.id.more) AppCompatImageButton more;
 
         public VHContent(final View v) {
             super(v);
             ButterKnife.bind(this, v);
-
-            // Popup menu for QAB overflow
-            final PopupMenu menu = new PopupMenu(v.getContext().getApplicationContext(), more);
-            menu.getMenu().add("titleRes");
-
-            more.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    menu.show();
-                }
-            });
         }
     }
 }

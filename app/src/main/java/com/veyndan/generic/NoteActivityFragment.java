@@ -42,7 +42,6 @@ public class NoteActivityFragment extends Fragment {
     @Bind(R.id.about) TextView about;
     @Bind(R.id.notes) Button notes;
     @Bind(R.id.other) AppCompatImageButton other;
-    @Bind(R.id.more) AppCompatImageButton more;
     @Bind(R.id.comments) RecyclerView comments;
 
     public NoteActivityFragment() {

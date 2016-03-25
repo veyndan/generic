@@ -24,7 +24,8 @@ public class PhotosFragment extends BottomSheetDialogFragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosFragment.class);
 
-    private final BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+    private final BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback =
+            new BottomSheetBehavior.BottomSheetCallback() {
 
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -52,7 +53,6 @@ public class PhotosFragment extends BottomSheetDialogFragment {
 
         int screenWidth = getScreenWidth();
         int gridSpanCount = getGridSpanCount(screenWidth);
-
         int itemWidth = (int) ((float) screenWidth / gridSpanCount);
 
         RecyclerView recyclerView = (RecyclerView) contentView.findViewById(R.id.attach_photo_recycler_view);
