@@ -10,7 +10,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 
 import com.veyndan.generic.R;
@@ -21,14 +20,9 @@ import com.veyndan.generic.util.UIUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TODO Set column count depending on screen width
- */
 public class PhotosFragment extends BottomSheetDialogFragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosFragment.class);
-
-    private static final int GRID_SPAN_COUNT = 3;
 
     private final BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
@@ -56,9 +50,14 @@ public class PhotosFragment extends BottomSheetDialogFragment {
             ((BottomSheetBehavior) behavior).setBottomSheetCallback(bottomSheetBehaviorCallback);
         }
 
+        int screenWidth = getScreenWidth();
+        int gridSpanCount = getGridSpanCount(screenWidth);
+
+        int itemWidth = (int) ((float) screenWidth / gridSpanCount);
+
         RecyclerView recyclerView = (RecyclerView) contentView.findViewById(R.id.attach_photo_recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), GRID_SPAN_COUNT));
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(GRID_SPAN_COUNT, UIUtils.dpToPx(getContext(), 4), false));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), gridSpanCount));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(gridSpanCount, UIUtils.dpToPx(getContext(), 4), false));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
@@ -68,15 +67,6 @@ public class PhotosFragment extends BottomSheetDialogFragment {
                 return true;
             }
         });
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        Log.d(TAG, "setupDialog: " + metrics.widthPixels);
-
-        int itemWidth = (int) (((float) metrics.widthPixels) / GRID_SPAN_COUNT);
-
-        Log.d(TAG, "setupDialog: " + itemWidth);
 
         PhotosAdapter adapter = new PhotosAdapter(getActivity(), init(), itemWidth);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
@@ -91,6 +81,16 @@ public class PhotosFragment extends BottomSheetDialogFragment {
             photos.add(new Photo(path));
         }
         return photos;
+    }
+
+    public int getScreenWidth() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.widthPixels;
+    }
+
+    public int getGridSpanCount(int screenWidth) {
+        return (int) Math.floor((float) screenWidth / UIUtils.dpToPx(getContext(), 120));
     }
 
 }
