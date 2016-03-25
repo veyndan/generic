@@ -8,12 +8,46 @@ deselect the image as well-->
     android:layout_height="0dp"
     android:background="@android:color/transparent">
 
-    <ImageView
-        android:id="@+id/item_attach_camera_image"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        tools:ignore="ContentDescription" />
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/test1"
+            android:rotation="30"
+            android:alpha="0.6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:ignore="ContentDescription"/>
+
+        <ImageView
+            android:id="@+id/test2"
+            android:rotation="20"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:scaleType="centerCrop"
+            tools:ignore="ContentDescription"/>
+
+        <ImageView
+            android:id="@+id/test3"
+            android:rotation="10"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:scaleType="centerCrop"
+            tools:ignore="ContentDescription"/>
+
+        <ImageView
+            android:id="@+id/item_attach_camera_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:ignore="ContentDescription"/>
+
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/item_attach_camera_count"

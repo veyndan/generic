@@ -1,6 +1,5 @@
 package com.veyndan.generic.attach;
 
-import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -8,19 +7,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * An implementation of {@link ItemTouchHelper.Callback} that enables basic drag & drop and
  * swipe-to-dismiss. Drag events are automatically started by an item long-press.<br/>
  * </br/>
- * Expects the <code>RecyclerView.Adapter</code> to react to {@link
- * ItemTouchHelperAdapter} callbacks and the <code>RecyclerView.ViewHolder</code> to implement
- * {@link ItemTouchHelperViewHolder}.
+ * Expects the <code>RecyclerView.ViewHolder</code> to implement {@link ItemTouchHelperViewHolder}.
  *
  * @author Paul Burke (ipaulpro)
  */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
-
-    private final ItemTouchHelperAdapter adapter;
-
-    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
-        this.adapter = adapter;
-    }
 
     @Override
     public boolean isLongPressDragEnabled() {
@@ -64,16 +55,6 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
         ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
         itemViewHolder.onItemClear();
-    }
-
-    @Override
-    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-            adapter.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        } else {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        }
     }
 
 }

@@ -1,8 +1,8 @@
 package com.veyndan.generic.attach;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,44 +32,29 @@ import butterknife.BindInt;
 import butterknife.ButterKnife;
 
 /**
- * TODO selectedItemViews probably causing a lot of UI and performance issues
- * Somehow attach underlay to top view, as only need images, removing the need
- * for this. Similar to the previous commit one with an xml file, but instead
- * dynamically do a similar thing.
- * <p/>
- * TODO Stop bringToFront() being called for top longPressed view every time it is moved.
- * <p/>
  * TODO Hide bottom sheet while maintaining 'hold' of selected photos into HomeFragment.
  * <p/>
  * TODO Show bottom sheet again if not dropped into note composition view.
  * <p/>
  * TODO Add to composition view if photos dropped in.
  */
-public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
-        implements ItemTouchHelperAdapter {
+public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
-
-    private Interpolator interpolatorCollapse;
-
-    private float location[] = new float[2];
 
     private final Context context;
     private final List<Photo> photos;
     private final int itemWidth;
 
-    private List<VH> selectedItemViews;
-
-    private int longPressed = -1;
+    // Can't put in PhotosAdapter.VH as trying to reference positions of VH has to be done outside
+    // VH as multiple VH are created.
+    private int longPressedPosition = -1;
+    private float longPressedLocation[] = new float[2];
 
     public PhotosAdapter(Context context, List<Photo> photos, int itemWidth) {
         this.context = context;
         this.photos = photos;
         this.itemWidth = itemWidth;
-
-        interpolatorCollapse = new DecelerateInterpolator(4);
-
-        selectedItemViews = new ArrayList<>();
     }
 
     @Override
@@ -89,18 +74,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         return photos.size();
     }
 
-    @Override
-    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder
-            viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        viewHolder.itemView.setTranslationX(dX);
-        viewHolder.itemView.setTranslationY(dY);
-        for (VH holder : selectedItemViews) {
-            holder.itemView.setTranslationX(dX);
-            holder.itemView.setTranslationY(dY);
-        }
-        viewHolder.itemView.bringToFront();
-    }
-
     class VH extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         @SuppressWarnings("unused")
         private final String TAG = LogUtils.makeLogTag(VH.class);
@@ -109,11 +82,13 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
         @BindInt(android.R.integer.config_shortAnimTime) int durationShort;
 
         @Bind(R.id.item_attach_camera_image) ImageView image;
+        @Bind({R.id.test1, R.id.test2, R.id.test3}) List<ImageView> tests;
         @Bind(R.id.item_attach_camera_count) TextView count;
 
         private final SpringSystem springSystem = SpringSystem.create();
         private final Spring spring = springSystem.createSpring();
         private float springScale;
+        private Interpolator interpolatorCollapse = new DecelerateInterpolator(4);
 
         public VH(final View itemView, final int itemWidth) {
             super(itemView);
@@ -166,17 +141,50 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
             });
         }
 
-        public void bind(Photo photo, int position, List<Photo> photos) {
-            final float x = location[0] - itemView.getX();
-            final float y = location[1] - itemView.getY();
-            if (longPressed == position) {
+        public void bind(Photo photo, int position, final List<Photo> photos) {
+            final float x = longPressedLocation[0] - itemView.getX();
+            final float y = longPressedLocation[1] - itemView.getY();
+            if (longPressedPosition == position) {
                 count.setVisibility(View.VISIBLE);
                 int c = 0;
                 for (Photo p : photos) {
                     if (p.isSelected()) c++;
                 }
                 count.setText(String.valueOf(c));
-            } else if (longPressed != -1) {
+
+                List<Integer> list1 = new ArrayList<>();
+                for (int i = 0; i < photos.size(); i++) {
+                    if (position == i) continue;
+                    Photo p = photos.get(i);
+                    if (p.getCount() != -1) list1.add(p.getCount());
+                }
+                list1 = Ordering.natural().greatestOf(list1, 3);
+                final List<Integer> list = new ArrayList<>();
+                for (int i = 0; i < photos.size(); i++) {
+                    if (list1.contains(photos.get(i).getCount())) list.add(i);
+                }
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < list.size(); i++) {
+                            tests.get(i).setVisibility(View.VISIBLE);
+                            Glide.with(itemView.getContext()).loadFromMediaStore(
+                                    Uri.fromFile(new File(photos.get(list.get(i)).getPath())))
+                                    .into(tests.get(i));
+                        }
+                    }
+                }, durationCollapse);
+
+                for (ImageView test : tests) {
+                    test.setScaleX(springScale);
+                    test.setScaleY(springScale);
+                }
+
+            } else if (longPressedPosition != -1) {
+                for (ImageView test : tests) {
+                    test.setVisibility(View.GONE);
+                }
                 if (photo.isSelected()) {
 
                     // TODO Gives right elements but not in correct order (reason is using .contains)
@@ -198,20 +206,22 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
 
                     image.animate()
                             .rotation(list.contains(position) ? 8 * (list.indexOf(position) + 1) : 24)
-                            .alpha(list.contains(position) ? 0.6f : 0)
+//                            .alpha(list.contains(position) ? 0.6f : 0)
+                            .alpha(0)
                             .setInterpolator(interpolatorCollapse)
                             .setDuration(durationCollapse);
 
                     itemView.setTag("anim");
                     count.setVisibility(View.GONE);
-
-                    if (list.contains(getAdapterPosition())) selectedItemViews.add(this);
                 } else {
                     image.animate()
                             .alpha(0)
                             .setDuration(durationShort);
                 }
             } else {
+                for (ImageView test : tests) {
+                    test.setVisibility(View.GONE);
+                }
                 if ("anim".equals(itemView.getTag())) {
                     TranslateAnimation animation = new TranslateAnimation(x, 0, y, 0);
                     animation.setInterpolator(interpolatorCollapse);
@@ -225,13 +235,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                             .setDuration(durationCollapse);
 
                     itemView.setTag(null);
-
-                    selectedItemViews.clear();
                 }
                 image.animate()
                         .alpha(1)
                         .setDuration(durationShort);
-                Glide.with(context).loadFromMediaStore(
+                Glide.with(itemView.getContext()).loadFromMediaStore(
                         Uri.fromFile(new File(photos.get(position).getPath()))).into(image);
                 float scale;
                 if (photos.get(position).isSelected()) {
@@ -261,15 +269,15 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH>
                 spring.setCurrentValue(0, true);
                 spring.setEndValue(1);
             }
-            location[0] = itemView.getLeft();
-            location[1] = itemView.getTop();
-            longPressed = getAdapterPosition();
+            longPressedLocation[0] = itemView.getLeft();
+            longPressedLocation[1] = itemView.getTop();
+            longPressedPosition = getAdapterPosition();
             notifyItemRangeChanged(0, getItemCount());
         }
 
         @Override
         public void onItemClear() {
-            longPressed = -1;
+            longPressedPosition = -1;
             notifyItemRangeChanged(0, getItemCount());
         }
 

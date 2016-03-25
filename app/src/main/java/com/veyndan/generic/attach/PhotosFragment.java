@@ -69,7 +69,7 @@ public class PhotosFragment extends BottomSheetDialogFragment {
         });
 
         PhotosAdapter adapter = new PhotosAdapter(getActivity(), init(), itemWidth);
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback();
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
