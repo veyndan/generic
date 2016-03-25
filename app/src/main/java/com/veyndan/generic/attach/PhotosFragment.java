@@ -9,6 +9,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 
 import com.veyndan.generic.R;
@@ -67,7 +69,16 @@ public class PhotosFragment extends BottomSheetDialogFragment {
             }
         });
 
-        PhotosAdapter adapter = new PhotosAdapter(getActivity(), init());
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        Log.d(TAG, "setupDialog: " + metrics.widthPixels);
+
+        int itemWidth = (int) (((float) metrics.widthPixels) / GRID_SPAN_COUNT);
+
+        Log.d(TAG, "setupDialog: " + itemWidth);
+
+        PhotosAdapter adapter = new PhotosAdapter(getActivity(), init(), itemWidth);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
