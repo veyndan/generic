@@ -12,6 +12,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.google.common.collect.Collections2;
 import com.veyndan.generic.R;
 import com.veyndan.generic.attach.util.Gallery;
 import com.veyndan.generic.util.LogUtils;
@@ -78,11 +79,7 @@ public class PhotosFragment extends BottomSheetDialogFragment {
     }
 
     private List<Photo> init() {
-        List<Photo> photos = new ArrayList<>();
-        for (String path : Gallery.getImagesPath(getContext())) {
-            photos.add(new Photo(path));
-        }
-        return photos;
+        return new ArrayList<>(Collections2.transform(Gallery.getImagesPath(getContext()), Photo::new));
     }
 
     private int getScreenWidth() {

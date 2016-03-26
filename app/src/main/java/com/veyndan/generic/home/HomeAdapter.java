@@ -10,7 +10,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -81,31 +80,28 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                 .inflate(R.layout.description_paragraph_new, vhHeader.description, false);
         vhHeader.description.addView(paragraph);
 
-        vhHeader.post.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Note.Description> descriptions = new ArrayList<>();
-                for (int i = 0; i < vhHeader.description.getChildCount(); i++) {
-                    View child = vhHeader.description.getChildAt(i);
-                    if (child instanceof EditText) {
-                        descriptions.add(new Note.Description(
-                                ((EditText) child).getText().toString(),
-                                Note.Description.TYPE_PARAGRAPH
-                        ));
-                    }
+        vhHeader.post.setOnClickListener(v -> {
+            List<Note.Description> descriptions = new ArrayList<>();
+            for (int i = 0; i < vhHeader.description.getChildCount(); i++) {
+                View child = vhHeader.description.getChildAt(i);
+                if (child instanceof EditText) {
+                    descriptions.add(new Note.Description(
+                            ((EditText) child).getText().toString(),
+                            Note.Description.TYPE_PARAGRAPH
+                    ));
                 }
-                rootRef.push().setValue(new Note(
-                        vhHeader.name.getText().toString(),
-                        "Now",
-                        vhHeader.visibility.getSelectedItem().toString(),
-                        "0",
-                        "https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_" +
-                                "1387041911520027_1668446817_n.jpg?oh=" +
-                                "85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9",
-                        descriptions
-                ));
-                paragraph.setText(null);
             }
+            rootRef.push().setValue(new Note(
+                    vhHeader.name.getText().toString(),
+                    "Now",
+                    vhHeader.visibility.getSelectedItem().toString(),
+                    "0",
+                    "https://scontent-lhr3-1.xx.fbcdn.net/hphotos-frc3/v/t1.0-9/1098101_" +
+                            "1387041911520027_1668446817_n.jpg?oh=" +
+                            "85cb27b32003fb5080e73e18d03bbbc4&oe=574FB4F9",
+                    descriptions
+            ));
+            paragraph.setText(null);
         });
 
         final PopupMenu otherMenu = new PopupMenu(context, vhHeader.attach);
@@ -123,24 +119,16 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             e.printStackTrace();
         }
 
-        vhHeader.attach.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                otherMenu.show();
-            }
-        });
+        vhHeader.attach.setOnClickListener(v -> otherMenu.show());
 
-        otherMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_picture:
-                        BottomSheetDialogFragment bottomSheetDialogFragment = new PhotosFragment();
-                        bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-                        return true;
-                    default:
-                        return false;
-                }
+        otherMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_picture:
+                    BottomSheetDialogFragment bottomSheetDialogFragment = new PhotosFragment();
+                    bottomSheetDialogFragment.show(context.getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+                    return true;
+                default:
+                    return false;
             }
         });
     }
@@ -197,35 +185,24 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
             e.printStackTrace();
         }
 
-        vhContent.other.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                otherMenu.show();
+        vhContent.other.setOnClickListener(v -> otherMenu.show());
+
+        otherMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_delete:
+                    getRef(position).removeValue();
+                    return true;
+                default:
+                    return false;
             }
         });
 
-        otherMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_delete:
-                        getRef(position).removeValue();
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        vhContent.notes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
-                Intent view = new Intent(context, NoteActivity.class);
-                view.setAction(Intent.ACTION_VIEW);
-                view.putExtra("NOTE", note);
-                context.startActivity(view);
-            }
+        vhContent.notes.setOnClickListener(v -> {
+            Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
+            Intent view = new Intent(context, NoteActivity.class);
+            view.setAction(Intent.ACTION_VIEW);
+            view.putExtra("NOTE", note);
+            context.startActivity(view);
         });
     }
 

@@ -20,6 +20,7 @@ import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 import com.google.common.base.Objects;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
@@ -92,8 +93,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
             ButterKnife.bind(this, itemView);
 
             this.context = itemView.getContext();
-
-            springScale = ((float) itemWidth - UIUtils.dpToPx(context, 32)) / itemWidth;
+            this.springScale = ((float) itemWidth - UIUtils.dpToPx(context, 32)) / itemWidth;
 
             spring.setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(40, 7));
 
@@ -111,8 +111,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                 @Override
                 public void onClick(View v) {
                     if (photos.get(getAdapterPosition()).isSelected()) {
-                        spring.setCurrentValue(1, true);
-                        spring.setEndValue(0);
+                        spring.setCurrentValue(1, true).setEndValue(0);
 
                         photos.get(getAdapterPosition()).setCount(-1);
                         for (int i = 0; i < photos.size(); i++) {
@@ -122,13 +121,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                             }
                         }
                     } else {
-                        spring.setCurrentValue(0, true);
-                        spring.setEndValue(1);
+                        spring.setCurrentValue(0, true).setEndValue(1);
 
-                        int count = 0;
-                        for (Photo photo : photos) {
-                            if (photo.isSelected()) count++;
-                        }
+                        int count = Collections2.filter(photos, Photo::isSelected).size();
                         photos.get(getAdapterPosition()).setCount(count);
                     }
                     notifyItemChanged(getAdapterPosition());
@@ -178,14 +173,15 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                 if (photo.isSelected()) {
 
                     // TODO Gives right elements but not in correct order (reason is using .contains)
-                    List<Integer> list1 = new ArrayList<>();
-                    for (Photo p : photos) {
-                        list1.add(p.getCount());
-                    }
-                    list1 = Ordering.natural().greatestOf(list1, 3);
+                    List<Integer> list2 = FluentIterable
+                            .from(photos)
+                            .transform(Photo::getCount)
+                            .toSortedList(Integer::compareTo)
+                            .subList(photos.size() - 3, photos.size());
+
                     List<Integer> list = new ArrayList<>();
                     for (int i = 0; i < photos.size(); i++) {
-                        if (list1.contains(photos.get(i).getCount())) list.add(i);
+                        if (list2.contains(photos.get(i).getCount())) list.add(i);
                     }
 
                     TranslateAnimation translate = new TranslateAnimation(0, x, 0, y);
@@ -250,13 +246,8 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
         @Override
         public void onItemSelected() {
             if (!photos.get(getAdapterPosition()).isSelected()) {
-                int count = 0;
-                for (Photo photo : photos) {
-                    if (photo.isSelected())
-                        count++;
-                }
+                int count = Collections2.filter(photos, Photo::isSelected).size();
                 photos.get(getAdapterPosition()).setCount(count);
-
                 spring.setCurrentValue(0, true).setEndValue(1);
             }
             selectedLocation[0] = itemView.getLeft();

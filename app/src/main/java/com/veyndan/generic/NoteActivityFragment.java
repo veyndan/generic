@@ -103,12 +103,7 @@ public class NoteActivityFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            other.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    otherMenu.show();
-                }
-            });
+            other.setOnClickListener(v -> otherMenu.show());
 
             comments.setLayoutManager(new LinearLayoutManager(getContext()));
             comments.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
