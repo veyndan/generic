@@ -24,6 +24,8 @@ public class PhotosFragment extends BottomSheetDialogFragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosFragment.class);
 
+    private static final int GRID_SPACING_DP = 4;
+
     private final BottomSheetBehavior.BottomSheetCallback bottomSheetBehaviorCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
 
@@ -53,11 +55,11 @@ public class PhotosFragment extends BottomSheetDialogFragment {
 
         int screenWidth = getScreenWidth();
         int gridSpanCount = getGridSpanCount(screenWidth);
-        int itemWidth = (int) ((float) screenWidth / gridSpanCount);
+        int itemWidth = getItemWidth(screenWidth, gridSpanCount);
 
         RecyclerView recyclerView = (RecyclerView) contentView.findViewById(R.id.attach_photo_recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), gridSpanCount));
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(gridSpanCount, UIUtils.dpToPx(getContext(), 4), false));
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(gridSpanCount, UIUtils.dpToPx(getContext(), GRID_SPACING_DP), false));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
@@ -68,14 +70,14 @@ public class PhotosFragment extends BottomSheetDialogFragment {
             }
         });
 
-        PhotosAdapter adapter = new PhotosAdapter(getActivity(), init(), itemWidth);
+        PhotosAdapter adapter = new PhotosAdapter(init(), itemWidth);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback();
         recyclerView.setAdapter(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
     }
 
-    public List<Photo> init() {
+    private List<Photo> init() {
         List<Photo> photos = new ArrayList<>();
         for (String path : Gallery.getImagesPath(getContext())) {
             photos.add(new Photo(path));
@@ -83,14 +85,18 @@ public class PhotosFragment extends BottomSheetDialogFragment {
         return photos;
     }
 
-    public int getScreenWidth() {
+    private int getScreenWidth() {
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.widthPixels;
     }
 
-    public int getGridSpanCount(int screenWidth) {
+    private int getGridSpanCount(int screenWidth) {
         return (int) Math.floor((float) screenWidth / UIUtils.dpToPx(getContext(), 120));
+    }
+
+    private int getItemWidth(int screenWidth, int gridSpanCount) {
+        return (int) ((float) screenWidth / gridSpanCount);
     }
 
 }

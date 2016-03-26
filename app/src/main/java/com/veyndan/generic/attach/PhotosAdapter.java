@@ -18,6 +18,8 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
+import com.google.common.base.Objects;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Ordering;
 import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
@@ -31,28 +33,21 @@ import butterknife.Bind;
 import butterknife.BindInt;
 import butterknife.ButterKnife;
 
-/**
- * TODO Hide bottom sheet while maintaining 'hold' of selected photos into HomeFragment.
- * <p/>
- * TODO Show bottom sheet again if not dropped into note composition view.
- * <p/>
- * TODO Add to composition view if photos dropped in.
- */
+// TODO Hide bottom sheet while maintaining 'hold' of selected photos into HomeFragment.
+// TODO Show bottom sheet again if not dropped into note composition view.
+// TODO Add to composition view if photos dropped in.
+
 public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(PhotosAdapter.class);
 
-    private final Context context;
     private final List<Photo> photos;
     private final int itemWidth;
 
-    // Can't put in PhotosAdapter.VH as trying to reference positions of VH has to be done outside
-    // VH as multiple VH are created.
-    private int longPressedPosition = -1;
-    private float longPressedLocation[] = new float[2];
+    private boolean selected = false;
+    private float selectedLocation[] = new float[2];
 
-    public PhotosAdapter(Context context, List<Photo> photos, int itemWidth) {
-        this.context = context;
+    public PhotosAdapter(List<Photo> photos, int itemWidth) {
         this.photos = photos;
         this.itemWidth = itemWidth;
     }
@@ -66,7 +61,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
 
     @Override
     public void onBindViewHolder(final VH holder, int position) {
-        holder.bind(photos.get(position), position, photos);
+        holder.bind(photos.get(position), photos);
     }
 
     @Override
@@ -87,12 +82,16 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
 
         private final SpringSystem springSystem = SpringSystem.create();
         private final Spring spring = springSystem.createSpring();
-        private float springScale;
-        private Interpolator interpolatorCollapse = new DecelerateInterpolator(4);
+        private final float springScale;
+        private final Interpolator interpolatorCollapse = new DecelerateInterpolator(4);
+
+        private final Context context;
 
         public VH(final View itemView, final int itemWidth) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            this.context = itemView.getContext();
 
             springScale = ((float) itemWidth - UIUtils.dpToPx(context, 32)) / itemWidth;
 
@@ -115,16 +114,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                         spring.setCurrentValue(1, true);
                         spring.setEndValue(0);
 
-                        for (Photo photo : photos) {
-                            if (photo.getCount() > photos.get(getAdapterPosition()).getCount()) {
-                                photo.setCount(photo.getCount() - 1);
-                            }
-                        }
                         photos.get(getAdapterPosition()).setCount(-1);
-
                         for (int i = 0; i < photos.size(); i++) {
-                            if (photos.get(i).getCount() > photos.get(getAdapterPosition()).getCount())
+                            if (photos.get(i).getCount() > photos.get(getAdapterPosition()).getCount()) {
+                                photos.get(i).setCount(photos.get(i).getCount() - 1);
                                 notifyItemChanged(i);
+                            }
                         }
                     } else {
                         spring.setCurrentValue(0, true);
@@ -141,16 +136,14 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
             });
         }
 
-        public void bind(Photo photo, int position, final List<Photo> photos) {
-            final float x = longPressedLocation[0] - itemView.getX();
-            final float y = longPressedLocation[1] - itemView.getY();
-            if (longPressedPosition == position) {
+        public void bind(Photo photo, final List<Photo> photos) {
+            final float x = selectedLocation[0] - itemView.getX();
+            final float y = selectedLocation[1] - itemView.getY();
+            int position = getAdapterPosition();
+
+            if (Objects.equal(itemView.getTag(R.id.tag_selected), position)) {
                 count.setVisibility(View.VISIBLE);
-                int c = 0;
-                for (Photo p : photos) {
-                    if (p.isSelected()) c++;
-                }
-                count.setText(String.valueOf(c));
+                count.setText(String.valueOf(Collections2.filter(photos, Photo::isSelected).size()));
 
                 List<Integer> list1 = new ArrayList<>();
                 for (int i = 0; i < photos.size(); i++) {
@@ -164,15 +157,12 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                     if (list1.contains(photos.get(i).getCount())) list.add(i);
                 }
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < list.size(); i++) {
-                            tests.get(i).setVisibility(View.VISIBLE);
-                            Glide.with(itemView.getContext()).loadFromMediaStore(
-                                    Uri.fromFile(new File(photos.get(list.get(i)).getPath())))
-                                    .into(tests.get(i));
-                        }
+                new Handler().postDelayed(() -> {
+                    for (int i = 0; i < list.size(); i++) {
+                        tests.get(i).setVisibility(View.VISIBLE);
+                        Glide.with(context).loadFromMediaStore(
+                                Uri.fromFile(new File(photos.get(list.get(i)).getPath())))
+                                .into(tests.get(i));
                     }
                 }, durationCollapse);
 
@@ -181,7 +171,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                     test.setScaleY(springScale);
                 }
 
-            } else if (longPressedPosition != -1) {
+            } else if (selected) {
                 for (ImageView test : tests) {
                     test.setVisibility(View.GONE);
                 }
@@ -239,7 +229,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                 image.animate()
                         .alpha(1)
                         .setDuration(durationShort);
-                Glide.with(itemView.getContext()).loadFromMediaStore(
+                Glide.with(context).loadFromMediaStore(
                         Uri.fromFile(new File(photos.get(position).getPath()))).into(image);
                 float scale;
                 if (photos.get(position).isSelected()) {
@@ -262,22 +252,24 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
             if (!photos.get(getAdapterPosition()).isSelected()) {
                 int count = 0;
                 for (Photo photo : photos) {
-                    if (photo.isSelected()) count++;
+                    if (photo.isSelected())
+                        count++;
                 }
                 photos.get(getAdapterPosition()).setCount(count);
 
-                spring.setCurrentValue(0, true);
-                spring.setEndValue(1);
+                spring.setCurrentValue(0, true).setEndValue(1);
             }
-            longPressedLocation[0] = itemView.getLeft();
-            longPressedLocation[1] = itemView.getTop();
-            longPressedPosition = getAdapterPosition();
+            selectedLocation[0] = itemView.getLeft();
+            selectedLocation[1] = itemView.getTop();
+            itemView.setTag(R.id.tag_selected, getAdapterPosition());
+            selected = true;
             notifyItemRangeChanged(0, getItemCount());
         }
 
         @Override
         public void onItemClear() {
-            longPressedPosition = -1;
+            itemView.setTag(R.id.tag_selected, null);
+            selected = false;
             notifyItemRangeChanged(0, getItemCount());
         }
 

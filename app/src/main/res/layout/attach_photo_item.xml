@@ -3,10 +3,10 @@
 <!-- Wrapped in SquareFrameLayout as when image scaled down, pressing the container will
 deselect the image as well-->
 <com.veyndan.generic.ui.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:background="@android:color/transparent">
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="0dp"
+                                             android:background="@android:color/transparent">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -14,28 +14,28 @@ deselect the image as well-->
 
         <ImageView
             android:id="@+id/test1"
-            android:rotation="30"
-            android:alpha="0.6"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:rotation="30"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
         <ImageView
             android:id="@+id/test2"
-            android:rotation="20"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
+            android:rotation="20"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
         <ImageView
             android:id="@+id/test3"
-            android:rotation="10"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
+            android:rotation="10"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
@@ -62,5 +62,5 @@ deselect the image as well-->
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_xsmall"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 </com.veyndan.generic.ui.SquareRelativeLayout>
