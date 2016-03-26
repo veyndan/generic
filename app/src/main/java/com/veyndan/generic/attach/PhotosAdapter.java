@@ -1,5 +1,7 @@
 package com.veyndan.generic.attach;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
@@ -141,8 +143,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                 count.setText(String.valueOf(Collections2.filter(photos, Photo::isSelected).size()));
 
                 List<Integer> list1 = new ArrayList<>();
-                for (int i = 0; i < photos.size(); i++) {
-                    if (position == i) continue;
+                for (int i = 0; i < photos.size() && position != i; i++) {
                     Photo p = photos.get(i);
                     if (p.getCount() != -1) list1.add(p.getCount());
                 }
@@ -192,10 +193,15 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
 
                     image.animate()
                             .rotation(list.contains(position) ? 8 * (list.indexOf(position) + 1) : 24)
-//                            .alpha(list.contains(position) ? 0.6f : 0)
-                            .alpha(0)
+                            .alpha(list.contains(position) ? 0.6f : 0)
                             .setInterpolator(interpolatorCollapse)
-                            .setDuration(durationCollapse);
+                            .setDuration(durationCollapse)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    image.setVisibility(View.INVISIBLE);
+                                }
+                            });
 
                     itemView.setTag("anim");
                     count.setVisibility(View.GONE);
@@ -218,7 +224,13 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.VH> {
                     image.animate()
                             .rotation(0)
                             .setInterpolator(interpolatorCollapse)
-                            .setDuration(durationCollapse);
+                            .setDuration(durationCollapse)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                    image.setVisibility(View.VISIBLE);
+                                }
+                            });
 
                     itemView.setTag(null);
                 }

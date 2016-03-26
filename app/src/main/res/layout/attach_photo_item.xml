@@ -2,22 +2,23 @@
 
 <!-- Wrapped in SquareFrameLayout as when image scaled down, pressing the container will
 deselect the image as well-->
-<com.veyndan.generic.ui.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="0dp"
-                                             android:background="@android:color/transparent">
+<com.veyndan.generic.ui.SquareRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:background="@android:color/transparent">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/test1"
+            android:id="@+id/test3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
-            android:rotation="30"
+            android:rotation="24"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
@@ -26,16 +27,16 @@ deselect the image as well-->
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
-            android:rotation="20"
+            android:rotation="16"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
         <ImageView
-            android:id="@+id/test3"
+            android:id="@+id/test1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.6"
-            android:rotation="10"
+            android:rotation="8"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"/>
 
