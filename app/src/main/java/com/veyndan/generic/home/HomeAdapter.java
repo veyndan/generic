@@ -1,6 +1,5 @@
 package com.veyndan.generic.home;
 
-import android.content.Intent;
 import android.content.res.Resources;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
-import com.veyndan.generic.NoteActivity;
 import com.veyndan.generic.R;
 import com.veyndan.generic.attach.PhotosFragment;
 import com.veyndan.generic.home.data.FirebaseAdapterRecyclerAdapter;
@@ -195,13 +193,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                 default:
                     return false;
             }
-        });
-
-        vhContent.notes.setOnClickListener(v -> {
-            Intent view = new Intent(context, NoteActivity.class);
-            view.setAction(Intent.ACTION_VIEW);
-            view.putExtra("NOTE", note);
-            context.startActivity(view);
         });
     }
 

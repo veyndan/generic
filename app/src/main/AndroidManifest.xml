@@ -22,15 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NoteActivity"
-            android:label="@string/title_activity_note"
-            android:parentActivityName=".home.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.veyndan.generic.home.MainActivity"/>
-        </activity>
     </application>
 
 </manifest>
