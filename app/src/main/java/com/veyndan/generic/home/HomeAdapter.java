@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.client.Firebase;
@@ -137,6 +136,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     protected void onBindContentItemViewHolder(VH holder, final int position) {
         VHContent vhContent = (VHContent) holder;
         final Note note = getItem(position);
+        Log.d(TAG, getRef(position).getKey());
         Glide.with(context).load(note.getProfile()).into(vhContent.profile);
         vhContent.name.setText(note.getName());
         vhContent.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
@@ -198,7 +198,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         });
 
         vhContent.notes.setOnClickListener(v -> {
-            Toast.makeText(v.getContext().getApplicationContext(), "NOTES!!!", Toast.LENGTH_SHORT).show();
             Intent view = new Intent(context, NoteActivity.class);
             view.setAction(Intent.ACTION_VIEW);
             view.putExtra("NOTE", note);

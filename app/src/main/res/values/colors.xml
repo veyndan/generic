@@ -9,4 +9,5 @@
     <color name="body_text_disabled">#44000000</color>
     <color wname="body_text_1_inverse">#deffffff</color>
     <color name="body_text_2_inverse">#8affffff</color>
+    <color name="red_200">#EF9A9A</color>
 </resources>

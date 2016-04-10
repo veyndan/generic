@@ -13,16 +13,17 @@ public class Note implements Parcelable {
     private String pins;
     private String profile;
     private List<Description> descriptions;
+    private List<String> children;
 
     @SuppressWarnings("unused")
     public Note() {
         // empty default constructor, necessary for Firebase to be able to deserialize notes
     }
 
-    public Note(String name, String date, String visiblity, String pins, String profile, List<Description> descriptions) {
+    public Note(String name, String date, String visibility, String pins, String profile, List<Description> descriptions) {
         this.name = name;
         this.date = date;
-        this.visibility = visiblity;
+        this.visibility = visibility;
         this.pins = pins;
         this.profile = profile;
         this.descriptions = descriptions;
@@ -52,15 +53,25 @@ public class Note implements Parcelable {
         return descriptions;
     }
 
+    public List<String> getChildren() {
+        return children;
+    }
+
+    public void addChild(String id) {
+        if (children == null) children = new ArrayList<>();
+        children.add(id);
+    }
+
     @Override
     public String toString() {
         return "Note{" +
                 "name='" + name + '\'' +
                 ", date='" + date + '\'' +
                 ", visibility='" + visibility + '\'' +
-                ", notes='" + pins + '\'' +
+                ", pins='" + pins + '\'' +
                 ", profile='" + profile + '\'' +
                 ", descriptions=" + descriptions +
+                ", children=" + children +
                 '}';
     }
 
@@ -77,7 +88,9 @@ public class Note implements Parcelable {
             return false;
         if (pins != null ? !pins.equals(note.pins) : note.pins != null) return false;
         if (profile != null ? !profile.equals(note.profile) : note.profile != null) return false;
-        return descriptions != null ? descriptions.equals(note.descriptions) : note.descriptions == null;
+        if (descriptions != null ? !descriptions.equals(note.descriptions) : note.descriptions != null)
+            return false;
+        return children != null ? children.equals(note.children) : note.children == null;
 
     }
 
@@ -89,54 +102,8 @@ public class Note implements Parcelable {
         result = 31 * result + (pins != null ? pins.hashCode() : 0);
         result = 31 * result + (profile != null ? profile.hashCode() : 0);
         result = 31 * result + (descriptions != null ? descriptions.hashCode() : 0);
+        result = 31 * result + (children != null ? children.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(date);
-        dest.writeString(visibility);
-        dest.writeString(pins);
-        dest.writeString(profile);
-        if (descriptions == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(descriptions);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
-        @Override
-        public Note createFromParcel(Parcel in) {
-            return new Note(in);
-        }
-
-        @Override
-        public Note[] newArray(int size) {
-            return new Note[size];
-        }
-    };
-
-    protected Note(Parcel in) {
-        name = in.readString();
-        date = in.readString();
-        visibility = in.readString();
-        pins = in.readString();
-        profile = in.readString();
-        if (in.readByte() == 0x01) {
-            descriptions = new ArrayList<Description>();
-            in.readList(descriptions, Description.class.getClassLoader());
-        } else {
-            descriptions = null;
-        }
     }
 
     public static class Description implements Parcelable {
@@ -166,6 +133,14 @@ public class Note implements Parcelable {
         }
 
         @Override
+        public String toString() {
+            return "Description{" +
+                    "body='" + body + '\'' +
+                    ", type=" + type +
+                    '}';
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -183,6 +158,7 @@ public class Note implements Parcelable {
             result = 31 * result + type;
             return result;
         }
+
 
         protected Description(Parcel in) {
             body = in.readString();
@@ -213,4 +189,63 @@ public class Note implements Parcelable {
             }
         };
     }
+
+    protected Note(Parcel in) {
+        name = in.readString();
+        date = in.readString();
+        visibility = in.readString();
+        pins = in.readString();
+        profile = in.readString();
+        if (in.readByte() == 0x01) {
+            descriptions = new ArrayList<>();
+            in.readList(descriptions, Description.class.getClassLoader());
+        } else {
+            descriptions = null;
+        }
+        if (in.readByte() == 0x01) {
+            children = new ArrayList<>();
+            in.readList(children, String.class.getClassLoader());
+        } else {
+            children = null;
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(date);
+        dest.writeString(visibility);
+        dest.writeString(pins);
+        dest.writeString(profile);
+        if (descriptions == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(descriptions);
+        }
+        if (children == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(children);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Note> CREATOR = new Parcelable.Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 }

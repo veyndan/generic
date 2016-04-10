@@ -93,25 +93,22 @@ public abstract class FirebaseAdapterRecyclerAdapter<T, VH extends RecyclerView.
         this.modelClass = modelClass;
         snapshots = new FirebaseArray(ref);
 
-        snapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
-            @Override
-            public void onChanged(EventType type, int index, int oldIndex) {
-                switch (type) {
-                    case Added:
-                        notifyItemInserted(index + HEADER_SIZE);
-                        break;
-                    case Changed:
-                        notifyItemChanged(index + HEADER_SIZE);
-                        break;
-                    case Removed:
-                        notifyItemRemoved(index + HEADER_SIZE);
-                        break;
-                    case Moved:
-                        notifyItemMoved(oldIndex, index);
-                        break;
-                    default:
-                        throw new IllegalStateException("Incomplete case statement");
-                }
+        snapshots.setOnChangedListener((type, index, oldIndex) -> {
+            switch (type) {
+                case Added:
+                    notifyItemInserted(index + HEADER_SIZE);
+                    break;
+                case Changed:
+                    notifyItemChanged(index + HEADER_SIZE);
+                    break;
+                case Removed:
+                    notifyItemRemoved(index + HEADER_SIZE);
+                    break;
+                case Moved:
+                    notifyItemMoved(oldIndex, index);
+                    break;
+                default:
+                    throw new IllegalStateException("Incomplete case statement");
             }
         });
     }

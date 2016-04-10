@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.client.Firebase;
-import com.veyndan.generic.home.DividerItemDecoration;
-import com.veyndan.generic.home.HomeAdapter;
 import com.veyndan.generic.home.Note;
 import com.veyndan.generic.util.LogUtils;
 
@@ -29,9 +25,6 @@ import java.lang.reflect.Field;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class NoteActivityFragment extends Fragment {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(NoteActivityFragment.class);
@@ -42,7 +35,6 @@ public class NoteActivityFragment extends Fragment {
     @Bind(R.id.about) TextView about;
     @Bind(R.id.notes) Button notes;
     @Bind(R.id.other) AppCompatImageButton other;
-    @Bind(R.id.comments) RecyclerView comments;
 
     public NoteActivityFragment() {
     }
@@ -71,9 +63,12 @@ public class NoteActivityFragment extends Fragment {
                     case Note.Description.TYPE_PARAGRAPH:
                         TextView paragraph = (TextView) LayoutInflater.from(description.getContext())
                                 .inflate(R.layout.description_paragraph, description, false);
+                        SpannableString spannableString = new SpannableString(descrip.getBody());
+                        // TODO: Set span on spannableString so that the subnote being "talked about"
+                        // is highlighted with @color/red_200
                         description.removeAllViewsInLayout();
                         description.addView(paragraph);
-                        paragraph.setText(descrip.getBody());
+                        paragraph.setText(spannableString);
                         break;
                     case Note.Description.TYPE_IMAGE:
                         ImageView image = (ImageView) LayoutInflater.from(description.getContext())
@@ -104,12 +99,6 @@ public class NoteActivityFragment extends Fragment {
             }
 
             other.setOnClickListener(v -> otherMenu.show());
-
-            comments.setLayoutManager(new LinearLayoutManager(getContext()));
-            comments.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
-            HomeAdapter adapter = new HomeAdapter(getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"));
-            comments.setAdapter(adapter);
         }
         return view;
     }
