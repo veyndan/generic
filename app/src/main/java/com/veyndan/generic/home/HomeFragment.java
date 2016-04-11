@@ -12,11 +12,12 @@ import com.firebase.client.Firebase;
 import com.veyndan.generic.R;
 import com.veyndan.generic.util.LogUtils;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ScrollRecyclerView {
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeFragment.class);
 
     private HomeAdapter adapter;
+    private RecyclerView recyclerView;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -32,12 +33,13 @@ public class HomeFragment extends Fragment {
         // TODO: Gif loading in Android M in the recyclerview problem
         // https://stackoverflow.com/questions/33363107/warning-using-glide-in-recyclerview
 
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_home, container, false);
+        recyclerView = (RecyclerView) inflater.inflate(R.layout.fragment_home, container, false);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        adapter = new HomeAdapter(getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"));
+        adapter = new HomeAdapter(this, getActivity(), new Firebase("https://sweltering-heat-8337.firebaseio.com"));
         recyclerView.setAdapter(adapter);
 
         return recyclerView;
@@ -47,5 +49,10 @@ public class HomeFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         adapter.cleanup();
+    }
+
+    @Override
+    public void scrollBy(int dy) {
+        if (recyclerView != null) recyclerView.smoothScrollBy(0, dy);
     }
 }

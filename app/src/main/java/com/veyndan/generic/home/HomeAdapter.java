@@ -37,12 +37,14 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     @SuppressWarnings("unused")
     private static final String TAG = LogUtils.makeLogTag(HomeAdapter.class);
 
+    private final ScrollRecyclerView scrollRecyclerView;
     private final FragmentActivity context;
     private final Resources res;
     private final Firebase rootRef;
 
-    public HomeAdapter(FragmentActivity context, Firebase rootRef) {
+    public HomeAdapter(ScrollRecyclerView scrollRecyclerView, FragmentActivity context, Firebase rootRef) {
         super(Note.class, rootRef);
+        this.scrollRecyclerView = scrollRecyclerView;
         this.context = context;
         this.rootRef = rootRef;
         this.res = context.getResources();
@@ -134,7 +136,6 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
     protected void onBindContentItemViewHolder(VH holder, final int position) {
         VHContent vhContent = (VHContent) holder;
         final Note note = getItem(position);
-        Log.d(TAG, getRef(position).getKey());
         Glide.with(context).load(note.getProfile()).into(vhContent.profile);
         vhContent.name.setText(note.getName());
         vhContent.about.setText(context.getString(R.string.about, note.getDate(), note.getVisibility()));
@@ -194,6 +195,19 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
                     return false;
             }
         });
+
+        vhContent.notes.setOnClickListener(v -> {
+            v.setSelected(!v.isSelected());
+            Log.d(TAG, String.valueOf(v.isSelected()));
+            if (v.isSelected()) {
+                vhContent.subNotes.setVisibility(View.VISIBLE);
+                vhContent.itemView.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                scrollRecyclerView.scrollBy(vhContent.itemView.getTop());
+            } else {
+                vhContent.subNotes.setVisibility(View.GONE);
+                vhContent.itemView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+        });
     }
 
     static class VH extends RecyclerView.ViewHolder {
@@ -237,10 +251,13 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         @Bind(R.id.about) TextView about;
         @Bind(R.id.notes) Button notes;
         @Bind(R.id.other) AppCompatImageButton other;
+        @Bind(R.id.sub_notes) View subNotes;
 
         public VHContent(final View v) {
             super(v);
             ButterKnife.bind(this, v);
         }
+
     }
+
 }

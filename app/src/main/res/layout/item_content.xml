@@ -88,4 +88,11 @@
         android:background="?selectableItemBackground"
         android:textColor="@color/body_text_disabled"/>
 
+    <View
+        android:id="@+id/sub_notes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/heart"
+        android:background="@color/colorAccent"/>
+
 </RelativeLayout>

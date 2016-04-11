@@ -34,6 +34,7 @@ public class MainActivity extends BaseActivity {
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setTitle(null);
+            ab.hide();
         }
 
         if (viewPager != null && tabLayout != null) {
@@ -46,7 +47,6 @@ public class MainActivity extends BaseActivity {
                     tab.setIcon(R.drawable.ic_home_24dp);
                 }
             }
-
         }
     }
 
