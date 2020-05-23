@@ -244,7 +244,7 @@ public class HomeAdapter extends FirebaseAdapterRecyclerAdapter<Note, HomeAdapte
         }
     }
 
-    public static class VHContent extends VH {
+    static class VHContent extends VH {
         @SuppressWarnings("unused")
         private static final String TAG = LogUtils.makeLogTag(VHContent.class);
 
